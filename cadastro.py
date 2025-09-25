@@ -338,7 +338,7 @@ def CadastroView(page:ft.Page):
             return
 
         # Se tudo passou:
-        page.open(ft.SnackBar(ft.Text("Conta criada com sucesso!", color="White"), bgcolor="RED"))
+        page.open(ft.SnackBar(ft.Text("Conta criada com sucesso!", color="White"), bgcolor="GREEN"))
         page.update()
         return
 
@@ -357,3 +357,4 @@ def CadastroView(page:ft.Page):
         vertical_alignment="center",
         horizontal_alignment="center",
     )
+
