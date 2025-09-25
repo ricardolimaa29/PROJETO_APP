@@ -12,9 +12,9 @@ def CadastroView(page:ft.Page):
     page.window.width = 500
     page.window.min_width = 500
     page.window.max_width = 500
-    page.window.height = 800
-    page.window.min_height = 800
-    page.window.max_height = 800
+    page.window.height = 900
+    page.window.min_height = 900
+    page.window.max_height = 900
 
     state = {"step": 0}
 
@@ -357,4 +357,5 @@ def CadastroView(page:ft.Page):
         vertical_alignment="center",
         horizontal_alignment="center",
     )
+
 
