@@ -3,7 +3,6 @@ import flet as ft
 def LoginView(page: ft.Page):
     page.title = "Fabrica de programadores"
     page.theme_mode= "dark"
-    ft.Text
     page.window.min_height = 900
     page.window.min_width = 500
     page.window.max_height = 900
@@ -11,20 +10,9 @@ def LoginView(page: ft.Page):
     page.window.width = 500
     page.window.height = 900
     
-    def verificar_login(e):
-            if entrada_email.value == "admin" and entrada_senha.value == "1234":
-                    mensagem.value = "Login realizado com sucesso!"
-                    mensagem.color = ft.Colors.GREEN
-            else:
-                    mensagem.value = "Usuário ou senha incorretos."
-                    mensagem.color = ft.Colors.RED
-            page.update()
-
-
-
 
     botao_personalizado = ft.ElevatedButton(
-            "Entrar",width=150,
+            "Entrar",width=150,on_click=lambda _:page.go("/home"),
             style=ft.ButtonStyle(
                 color={
                     ft.ControlState.HOVERED: ft.Colors.WHITE,
@@ -47,7 +35,7 @@ def LoginView(page: ft.Page):
             ),
         )
     botao_cadastro = ft.ElevatedButton(
-            "Cadastrar",bgcolor=None
+            "Cadastrar",bgcolor=None,on_click=lambda _:page.go("/cadastro")
             
             )
         
@@ -57,7 +45,9 @@ def LoginView(page: ft.Page):
     entrada_senha = ft.TextField(label="Senha", password=True, width=300,border_color="WHITE")
     mensagem = ft.Text(size=16)
     
-    return ft.View(controls=[
+    return ft.View(
+        route = "/",
+        controls=[
         ft.Row([titulo],alignment="center"),
         ft.Row([entrada_email], alignment="center"),
         ft.Row([entrada_senha], alignment="center"),
@@ -65,8 +55,6 @@ def LoginView(page: ft.Page):
         ft.Row([criar,botao_cadastro], alignment="center"),
         ft.Row([mensagem], alignment="center")
     ],
-        alignment=ft.MainAxisAlignment.CENTER,
-        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-        spacing=10,
-        expand=True,
+        vertical_alignment="center",
+        horizontal_alignment="center"
 )
