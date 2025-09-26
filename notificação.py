@@ -1,6 +1,6 @@
 import flet as ft
 
-def main(page: ft.Page):
+def View_notificacao(page: ft.Page):
     page.title = "Fabrica de programadores"
     page.theme_mode = "dark"
     page.window.min_height = 900
@@ -42,42 +42,40 @@ def main(page: ft.Page):
             f"Update - direction: {e.direction}, progress: {e.progress}, reached: {e.reached}, previous_reached: {e.previous_reached}"
         )
 
-    # Criar o título corretamente como um widget Text
+    # Criar o título
     titulo = ft.Text("Caixa De Entrada", size=24, weight=ft.FontWeight.BOLD)
     
-    page.add(
-        ft.Row([titulo], alignment=ft.MainAxisAlignment.CENTER),
-        ft.Divider(height=10),
-        ft.ListView(
-            expand=True,
-            controls=[
-                ft.Dismissible(
-                    content=ft.ListTile(title=ft.Text(f"Item {i}")),
-                    dismiss_direction=ft.DismissDirection.HORIZONTAL,
-                    background=ft.Container(bgcolor=ft.Colors.GREEN, content=ft.Text("ARQUIVAR")),
-                    secondary_background=ft.Container(bgcolor=ft.Colors.RED,content=ft.Text("EXCLUIR")),
-                    on_dismiss=handle_dismiss,
-                    on_update=handle_update,
-                    on_confirm_dismiss=handle_confirm_dismiss,
-                    dismiss_thresholds={
-                        ft.DismissDirection.END_TO_START: 0.2,
-                        ft.DismissDirection.START_TO_END: 0.2,
-                    },
-                )
-                for i in range(10)
-            ],
-        )
-    )
+    # Criar os controles que estavam no seu return original
+    entrada_email = ft.TextField(label="Email", width=300)
+    entrada_senha = ft.TextField(label="Senha", password=True, width=300)
+    botao_personalizado = ft.ElevatedButton("Entrar")
+    criar = ft.Text("Criar uma conta")
+    botao_cadastro = ft.TextButton("Cadastre-se")
+    mensagem = ft.Text("", size=16)
 
-    # return ft.View(
-    #         route="/",
-    #         controls=[
-    #             ft.Row([titulo],alignment="center"),
-    #             ft.Row([nome],alignment="center"),
-    #             ft.Row([senha],alignment="center"),
-    #             ft.Row([botao,],alignment="center")
-    #         ],
-    #         vertical_alignment="center",
-    #         horizontal_alignment="center"
-    # )
-ft.app(target=main)
+    # Retornar a View com todos os controles
+    return ft.View(
+        controls=[
+            ft.Row([titulo], alignment=ft.MainAxisAlignment.CENTER),
+            ft.Divider(height=10),
+            ft.ListView(
+                expand=True,
+                controls=[
+                    ft.Dismissible(
+                        content=ft.ListTile(title=ft.Text(f"Item {i}")),
+                        dismiss_direction=ft.DismissDirection.HORIZONTAL,
+                        background=ft.Container(bgcolor=ft.Colors.GREEN, content=ft.Text("ARQUIVAR")),
+                        secondary_background=ft.Container(bgcolor=ft.Colors.RED, content=ft.Text("EXCLUIR")),
+                        on_dismiss=handle_dismiss,
+                        on_update=handle_update,
+                        on_confirm_dismiss=handle_confirm_dismiss,
+                        dismiss_thresholds={
+                            ft.DismissDirection.END_TO_START: 0.2,
+                            ft.DismissDirection.START_TO_END: 0.2,
+                        },
+                    )
+                    for i in range(10)
+                ],
+            ),
+        ]
+    )
