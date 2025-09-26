@@ -44,14 +44,6 @@ def View_notificacao(page: ft.Page):
 
     # Criar o título
     titulo = ft.Text("Caixa De Entrada", size=24, weight=ft.FontWeight.BOLD)
-    
-    # Criar os controles que estavam no seu return original
-    entrada_email = ft.TextField(label="Email", width=300)
-    entrada_senha = ft.TextField(label="Senha", password=True, width=300)
-    botao_personalizado = ft.ElevatedButton("Entrar")
-    criar = ft.Text("Criar uma conta")
-    botao_cadastro = ft.TextButton("Cadastre-se")
-    mensagem = ft.Text("", size=16)
 
     # Retornar a View com todos os controles
     return ft.View(
@@ -80,4 +72,5 @@ def View_notificacao(page: ft.Page):
             ),
         ]
     )
+
 
