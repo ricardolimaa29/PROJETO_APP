@@ -2,6 +2,8 @@ import flet as ft
 from home import HomeView
 from login import LoginView
 from cadastro import CadastroView
+from notificação import View_notificacao
+
 
 def main(page: ft.Page):
     page.title = "Area do Aluno"
@@ -19,6 +21,9 @@ def main(page: ft.Page):
             page.views.append(HomeView(page))
         elif page.route == "/cadastro":
             page.views.append(CadastroView(page))
+        elif page.route == "/notificacao":
+            page.views.append(View_notificacao(page))    
+        
 
         page.update()
 
