@@ -17,7 +17,6 @@ def main(page: ft.Page):
 
     # ---------- Cores e Tema ----------
     primary_color = ft.Colors.CYAN_400
-    secondary_color = ft.Colors.PURPLE_400
     background_color = ft.Colors.GREY_900
     card_color = ft.Colors.GREY_800
 
@@ -44,8 +43,7 @@ def main(page: ft.Page):
         return ft.Container(
             content=ft.Row(
                 [
-                    ft.Text(title, size=18, weight=ft.FontWeight.BOLD,
-                            color=primary_color),
+                    ft.Text(title, size=18, weight=ft.FontWeight.BOLD, color=primary_color),
                 ],
                 alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
             ),
@@ -181,7 +179,8 @@ def main(page: ft.Page):
         ],
         on_change=lambda e: [
             change_page(e.control.controls[e.control.selected_index].label),
-            page.close(drawer),
+            setattr(drawer, "open", False),  # fecha drawer
+            page.update(),
         ],
     )
 
