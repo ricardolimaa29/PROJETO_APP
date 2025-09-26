@@ -55,6 +55,7 @@ def View_notificacao(page: ft.Page):
 
     # Retornar a View com todos os controles
     return ft.View(
+        route="/notificacao",
         controls=[
             ft.Row([titulo], alignment=ft.MainAxisAlignment.CENTER),
             ft.Divider(height=10),
@@ -79,3 +80,4 @@ def View_notificacao(page: ft.Page):
             ),
         ]
     )
+
