@@ -4,13 +4,12 @@ from login import LoginView
 from cadastro import CadastroView
 from notificação import View_notificacao
 
+# CRIAR UM BOTAO PARA INSERIR UM SITE DE PORTFOLIO PARA CADA DEV COM AS INFORMAÇÕES E O LINK PARA GIT
 
 def main(page: ft.Page):
     page.title = "Area do Aluno"
     page.window.width = 500
     page.window.height = 800
-    page.theme_mode = "dark"
-
     
     def route_change(e):
         page.views.clear()
@@ -18,7 +17,7 @@ def main(page: ft.Page):
         if page.route == "/":
             page.views.append(LoginView(page))
         elif page.route == "/home":
-            page.views.append(HomeView(page))
+            page.views.append(HomeView().get_view(page))
         elif page.route == "/cadastro":
             page.views.append(CadastroView(page))
         elif page.route == "/notificacao":
