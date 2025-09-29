@@ -44,9 +44,9 @@ def CadastroView(page:ft.Page):
         if re.search(r"\W", senha):     # Tem caractere especial
             pontos += 1
 
-        if pontos <= 2:
+        if pontos <= 5:
             return "fraca"
-        elif pontos == 3 or pontos == 4:
+        elif pontos == 6 or pontos == 7:
             return "média"
         else:
             return "forte"
@@ -357,5 +357,6 @@ def CadastroView(page:ft.Page):
         vertical_alignment="center",
         horizontal_alignment="center",
     )
+
 
 
