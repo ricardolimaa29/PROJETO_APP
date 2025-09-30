@@ -3,12 +3,12 @@ import flet as ft
 def suporte_view(page: ft.Page):
     page.title = "Suporte"
     page.theme_mode = ft.ThemeMode.DARK
-    page.window.width = 400
-    page.window.height = 700
-    page.window.min_width = 360
+    page.window.min_height = 900
+    page.window.min_width = 500
+    page.window.max_height = 900
     page.window.max_width = 500
-    page.window.min_height = 600
-    page.window.max_height = 800
+    page.window.width = 500
+    page.window.height = 900
     page.padding = 0
     page.window.center()
 
