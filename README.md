@@ -41,7 +41,7 @@ O objetivo é **aprender na prática** como funciona o desenvolvimento de um apl
 
 ```bash
 # Clone o repositório
-git clone https://github.com/seu-repositorio/app-mobile-fabrica.git
+git clone https://github.com/ricardolimaa29/PROJETO_APP.git
 
 # Acesse a pasta
 cd app-mobile-fabrica
