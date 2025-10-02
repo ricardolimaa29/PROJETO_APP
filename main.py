@@ -22,7 +22,8 @@ def main(page: ft.Page):
             page.views.append(CadastroView(page))
         elif page.route == "/notificacao":
             page.views.append(View_notificacao(page))    
-        
+        elif page.route == "/perfil":
+            page.views.append(View_perfil(page)) 
 
         page.update()
 
@@ -31,3 +32,4 @@ def main(page: ft.Page):
     page.go("/")  
 
 ft.app(target=main)
+
