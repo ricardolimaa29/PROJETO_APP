@@ -13,7 +13,7 @@ def suporte_view(page: ft.Page):
     page.window.center()
     voltar_button = ft.IconButton(
         icon="ARROW_BACK",
-        icon_color="YELLOW",
+        icon_color="Blue",
         tooltip="Voltar",
         on_click=lambda e: page.go("/home"),
 
