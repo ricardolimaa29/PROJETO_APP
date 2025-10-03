@@ -11,6 +11,19 @@ def suporte_view(page: ft.Page):
     page.window.height = 900
     page.padding = 0
     page.window.center()
+    voltar_button = ft.IconButton(
+        icon="ARROW_BACK",
+        icon_color="YELLOW",
+        tooltip="Voltar",
+        on_click=lambda e: page.go("/home"),
+
+    )
+
+    header = ft.Row(
+        controls=[voltar_button],
+        alignment="start"
+    )
+    page.add(header)
 
     # ---------- Inputs ----------
     envidas = ft.TextField(label="Nome de usuário", width=360)
