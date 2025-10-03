@@ -178,14 +178,35 @@ def Home(page: ft.Page):
     page.add(perfil)
 
     # NavBar inferior (Home, Notificacoes, Desempenho, Perfil, )
-    page.navigation_bar = NavigationBar(
-        destinations = [
-            NavigationBarDestination(icon=Icons.HOME_OUTLINED, label="Início"),
-            NavigationBarDestination(icon=Icons.LIBRARY_BOOKS_OUTLINED, label="Desempenho"),
-            NavigationBarDestination(icon=Icons.MESSAGE_OUTLINED, label="Notificações"),
-            NavigationBarDestination(icon=Icons.TAG_FACES_OUTLINED, label="Perfil"),
-        ]
-    )
+    page.navigation_bar = ft.NavigationBar(
+        selected_index=0,
+        indicator_color="TEMA",
+        # indicator_color="#0e68b1",
+        destinations=[
+            ft.NavigationBarDestination(
+                icon=ft.Icons.HOME_OUTLINED,
+                selected_icon=ft.Icons.HOME,
+                label="Início"
+            ),
+            ft.NavigationBarDestination(
+                icon=ft.Icons.LIBRARY_BOOKS_OUTLINED,
+                selected_icon=ft.Icons.INSERT_CHART,
+                label="Desempenho"
+            ),
+            ft.NavigationBarDestination(
+                icon=ft.Icons.MESSAGE_OUTLINED,
+                selected_icon=ft.Icons.MESSAGE,
+                label="Notificações"
+            ),
+            ft.NavigationBarDestination(
+                icon=ft.Icons.TAG_FACES_OUTLINED,
+                selected_icon=ft.Icons.PERSON,
+                label="Perfil"
+            ),
+        ],
+        on_change=lambda e: print(f"Você clicou na aba {e.control.selected_index}")
+)
+
 
     eventos = ft.Column(
         spacing=20,
