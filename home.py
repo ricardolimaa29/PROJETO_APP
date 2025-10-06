@@ -16,33 +16,14 @@ def Home(page: ft.Page):
     page.window.min_height = 800
     page.scroll = 'auto'
 
-    # FilePicker para foto de perfil
-    file_picker = ft.FilePicker()
-    page.overlay.append(file_picker)
-
-    # Variáveis para a foto de perfil
-    profile_photo_ref = ft.Ref[ft.Image]()
-    profile_initial_ref = ft.Ref[ft.Text]()
-
-    def pick_file(e):
-        file_picker.pick_files(allow_multiple=False, file_type=ft.FilePickerFileType.IMAGE)
-
-    def on_file_selected(e: ft.FilePickerResultEvent):
-        if e.files:
-            # Atualiza a foto de perfil
-            profile_photo_ref.current.src = e.files[0].path
-            profile_photo_ref.current.visible = True
-            profile_initial_ref.current.visible = False
-            page.update()
-
-    file_picker.on_result = on_file_selected
 
     # CARROSSEL MELHORADO
     carousel_images = [
-        "img\programadores.jpg",
-        "img\programa.jpeg", 
-        "img\santana.jpg",
-        "img\premio.png"
+        r"img\fabrica-programadores-parnaiba.png", 
+        r"img\ricardo.jpg", 
+        r"img\gaby.jpg",
+        
+        r"img\fabrica.jpg"
     ]
     carousel_index = 0
 
@@ -82,35 +63,7 @@ def Home(page: ft.Page):
     threading.Thread(target=auto_play, daemon=True).start()
 
     # Botões do carrossel mais elegantes
-    prev_button = ft.Container(
-        content=ft.Icon(
-            ft.Icons.ARROW_BACK_IOS_ROUNDED,
-            size=20,
-            color=ft.Colors.WHITE
-        ),
-        width=40,
-        height=40,
-        border_radius=20,
-        bgcolor=ft.Colors.BLACK54,
-        alignment=ft.alignment.center,
-        on_click=prev_slide,
-        margin=ft.margin.only(left=10)
-    )
-    
-    next_button = ft.Container(
-        content=ft.Icon(
-            ft.Icons.ARROW_FORWARD_IOS_ROUNDED,
-            size=20,
-            color=ft.Colors.WHITE
-        ),
-        width=40,
-        height=40,
-        border_radius=20,
-        bgcolor=ft.Colors.BLACK54,
-        alignment=ft.alignment.center,
-        on_click=next_slide,
-        margin=ft.margin.only(right=10)
-    )
+  
 
     # Indicadores (dots) mais modernos
     dots = ft.Row(
@@ -133,7 +86,7 @@ def Home(page: ft.Page):
             controls=[
                 carousel_image,
                 ft.Row(
-                    [prev_button, ft.Container(expand=True), next_button],
+                    
                     alignment="spaceBetween",
                     vertical_alignment="center",
                     height=200
@@ -181,12 +134,13 @@ def Home(page: ft.Page):
     page.appbar = ft.AppBar(
         leading_width=10,
         title=ft.Text("FÁBRICA DE PROGRAMADORES", weight="bold"),
-        center_title=False,
+        center_title=True,
         bgcolor=ft.Colors.SURFACE_CONTAINER_HIGHEST,  
         actions=[
             ft.PopupMenuButton(
                 items=[
                     ft.PopupMenuItem(text="TEMA", icon="WB_SUNNY_OUTLINED", on_click=mudar_tema),
+                     ft.PopupMenuItem(text="ACESSIBILIDADE", icon="ACCESSIBILITY", on_click=...),
                     ft.PopupMenuItem(text="CONFIGURAÇÕES", icon="SETTINGS_OUTLINED", on_click=clicou_menu),
                     ft.PopupMenuItem(text="SUPORTE", icon="HELP_OUTLINE_ROUNDED", on_click=clicou_menu),
                     ft.PopupMenuItem(),
@@ -195,59 +149,24 @@ def Home(page: ft.Page):
             ),
         ],
     )
-    
-    # PERFIL MELHORADO - Design mais atraente
+     # PERFIL
     perfil = ft.Container(
         content=ft.Row(
             spacing=20,
             controls=[
                 # Container da foto de perfil
-                ft.Stack([
-                    # Foto de perfil (inicialmente invisível)
-                    ft.Container(
-                        content=ft.Image(
-                            ref=profile_photo_ref,
-                            src="",
-                            width=110,
-                            height=110,
-                            fit=ft.ImageFit.COVER,
-                            border_radius=55
-                        ),
+                ft.Container(
+                    content=ft.Image(
+                        src=r"img\arthur.jpg",  # Caminho da imagem
                         width=110,
                         height=110,
-                        border_radius=55,
-                        bgcolor=ft.Colors.GREY_700,
-                        visible=False
+                        fit=ft.ImageFit.COVER,
                     ),
-                    # Avatar com inicial (inicialmente visível)
-                    ft.Container(
-                        content=ft.CircleAvatar(
-                            ref=profile_initial_ref,
-                            content=ft.Text("U", size=36, weight="bold", color=ft.Colors.WHITE),
-                            bgcolor=ft.Colors.DEEP_ORANGE,
-                            radius=55
-                        ),
-                        width=110,
-                        height=110,
-                        border_radius=55,
-                    ),
-                    # Botão da câmera
-                    ft.Container(
-                        content=ft.IconButton(
-                            icon=ft.Icons.CAMERA_ALT_ROUNDED, 
-                            icon_size=20, 
-                            icon_color="white",
-                            on_click=pick_file,
-                            tooltip="Alterar Foto",
-                            style=ft.ButtonStyle(
-                                bgcolor=ft.Colors.DEEP_ORANGE, 
-                                shape=ft.CircleBorder(),
-                                padding=8
-                            )
-                        ),
-                        alignment=ft.alignment.bottom_right,
-                    )
-                ]),
+                    width=110,
+                    height=110,
+                    border_radius=55,  # Torna circular
+                    clip_behavior=ft.ClipBehavior.HARD_EDGE,  # Importante para border_radius funcionar
+                ),
                 # Coluna com informações do usuário
                 ft.Column(
                     spacing=8,
@@ -259,8 +178,6 @@ def Home(page: ft.Page):
                             "Editar Perfil",
                             icon=ft.Icons.EDIT_ROUNDED,
                             style=ft.ButtonStyle(
-                                color=ft.Colors.WHITE,
-                                bgcolor=ft.Colors.DEEP_ORANGE,
                                 padding=ft.padding.symmetric(horizontal=20, vertical=10),
                                 shape=ft.RoundedRectangleBorder(radius=10)
                             )
@@ -287,7 +204,7 @@ def Home(page: ft.Page):
     # NavBar inferior
     page.navigation_bar = ft.NavigationBar(
         selected_index=0,
-        indicator_color=ft.Colors.DEEP_ORANGE,
+    
         destinations=[
             ft.NavigationBarDestination(
                 icon=ft.Icons.HOME_OUTLINED,
@@ -313,25 +230,37 @@ def Home(page: ft.Page):
         on_change=lambda e: print(f"Você clicou na aba {e.control.selected_index}")
     )
 
-    # Conteúdo restante - CORRIGIDO o Badge
+    # Função chamada ao clicar no container de material
+    def abrir_materia(e):
+        page.snack_bar = ft.SnackBar(
+            ft.Text("Abrindo material do curso..."),
+            bgcolor=ft.Colors.DEEP_ORANGE
+        )
+        page.snack_bar.open = True
+        page.update()
+
+    # Container de MATERIAL DO CURSO 
     eventos = ft.Container(
+        on_click=abrir_materia,
+        ink=True,
         content=ft.Column(
+        alignment=ft.alignment.center, 
             spacing=15,
+            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
             controls=[
                 ft.Text("MATERIAL DO CURSO", size=18, weight="bold"),
                 ft.Container(
                     content=ft.Column([
                         ft.ListTile(
-                            leading=ft.Icon(ft.Icons.CODE_ROUNDED, color=ft.Colors.DEEP_ORANGE),
-                            title=ft.Text("Projeto Python Concluído", weight="bold"),
-                            subtitle=ft.Text("Finalizado com sucesso - 95% de aproveitamento"),
+                            leading=ft.Image(src="img\python.jpg"),
+                            title=ft.Text("AULAS DE PYTHON", weight="bold"),
+                            subtitle=ft.Text("70% DE APROVEITAMENTO DAS AULAS"),
                             trailing=ft.Icon(ft.Icons.CHECK_CIRCLE_ROUNDED, color=ft.Colors.GREEN)
                         ),
                         ft.ListTile(
-                            leading=ft.Icon(ft.Icons.BUG_REPORT_ROUNDED, color=ft.Colors.ORANGE),
-                            title=ft.Text("Problemas Identificados", weight="bold"),
-                            subtitle=ft.Text("2 issues precisam de atenção"),
-                            # Substituindo Badge por Container personalizado
+                            leading=ft.Image(src="img/api.jpg"),
+                            title=ft.Text("AULAS DE API", weight="bold"),
+                            subtitle=ft.Text("30% DE APROVEITAMENTO DAS AULAS"),
                             trailing=ft.Container(
                                 content=ft.Text("2", color=ft.Colors.WHITE, size=12, weight="bold"),
                                 bgcolor=ft.Colors.RED,
@@ -348,7 +277,16 @@ def Home(page: ft.Page):
         padding=20,
         margin=15,
         border_radius=15,
-        bgcolor=ft.Colors.SURFACE_CONTAINER_HIGHEST
+        bgcolor=ft.Colors.SURFACE_CONTAINER_HIGHEST,
+        shadow=ft.BoxShadow(
+            spread_radius=1,
+            blur_radius=10,
+            color=ft.Colors.BLACK26,
+            offset=ft.Offset(0, 2)
+        ),
+        # Efeito visual de hover para parecer um botão
+        animate=ft.Animation(200, "easeInOut"),
+        on_hover=lambda e: eventos.__setattr__("bgcolor", ft.Colors.SURFACE_CONTAINER_HIGH if e.data == "true" else ft.Colors.SURFACE_CONTAINER_HIGHEST)
     )
 
     # Função para abrir links externos
@@ -359,9 +297,11 @@ def Home(page: ft.Page):
     links = ft.Container(
         content=ft.Column(
             spacing=20,
+            alignment=ft.alignment.center,
+            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
             controls=[
-                ft.Text("SITES", size=18, weight="bold" ),
-                ft.Row(
+                ft.Text("SITES IMPORTANTES", size=18, weight="bold", ),
+                ft.Row( 
                     alignment="spaceEvenly",
                     spacing=10,
                     controls=[
@@ -371,7 +311,7 @@ def Home(page: ft.Page):
                             controls=[
                                 ft.Container(
                                     content=ft.Image(
-                                        src="img\logo.jpg",
+                                        src="img\santana.png",  
                                         width=70,
                                         height=70,
                                         fit=ft.ImageFit.COVER
@@ -391,7 +331,7 @@ def Home(page: ft.Page):
                             controls=[
                                 ft.Container(
                                     content=ft.Image(
-                                        src="img\manutenção.jpg",
+                                        src="img\portifolio.jpg",  # Corrigido: use / em vez de \
                                         width=70,
                                         height=70,
                                         fit=ft.ImageFit.COVER
@@ -411,7 +351,7 @@ def Home(page: ft.Page):
                             controls=[
                                 ft.Container(
                                     content=ft.Image(
-                                        src="img\senai.jpg",
+                                        src="img\senai.jpg",  # Corrigido: use / em vez de \
                                         width=70,
                                         height=70,
                                         fit=ft.ImageFit.COVER
@@ -434,12 +374,10 @@ def Home(page: ft.Page):
         border_radius=15,
         bgcolor=ft.Colors.SURFACE_CONTAINER_HIGHEST
     )
-
     # Adicionar todos os componentes à página
     page.add(
         carousel,
         eventos,
         links
     )
-
 ft.app(target=Home)
