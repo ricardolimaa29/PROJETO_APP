@@ -20,7 +20,7 @@ def Home(page: ft.Page):
     # CARROSSEL MELHORADO
     carousel_images = [
         r"img\fabrica-programadores-parnaiba.png", 
-        r"img\ricardo.jpg", 
+        r"img\sala.jpg", 
         r"img\gaby.jpg",
         
         r"img\fabrica.jpg"
@@ -381,3 +381,4 @@ def Home(page: ft.Page):
         links
     )
 ft.app(target=Home)
+
