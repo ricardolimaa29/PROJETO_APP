@@ -17,7 +17,7 @@ def main(page: ft.Page):
     # ============================================
 
     # Tela de carregamento
-    def criar_tela_loading():
+    def CarregamentoView():
         return ft.Container(
             width=400,
             height=700,
@@ -134,7 +134,7 @@ def main(page: ft.Page):
                     ),
                     ft.Container(height=10),
                     ft.Text(
-                        "Bem-vindo ao seu aplicativo",
+                        "Bem-vindo a Fábrica de Programadores",
                         size=16,
                         color=ft.Colors.WHITE70,
                         text_align=ft.TextAlign.CENTER,
@@ -156,15 +156,18 @@ def main(page: ft.Page):
             ),
         )
         
-        page.add(tela_principal)
-        page.update()
-
     # Adiciona a tela de loading
-    tela_loading = criar_tela_loading()
-    page.add(tela_loading)
+  
     page.update()
 
     # Inicia a thread para remover o loading após o tempo definido
     threading.Thread(target=remover_loading, daemon=True).start()
-
-ft.app(target=main)
+ 
+    return ft.View(
+        route = "/carregamento",
+        controls=[
+        CarregamentoView
+    ],
+        vertical_alignment="center",
+        horizontal_alignment="center"
+)
