@@ -343,20 +343,36 @@ def CadastroView(page:ft.Page):
         return
 
     # --------------------------------------------------------------------------------------------------
+    # Botão de voltar e header
+    voltar_button = ft.IconButton(
+        icon="ARROW_BACK",
+        icon_color="YELLOW",
+        tooltip="Voltar",
+        on_click=lambda e: page.go("/login"),
+    )
+
+    header = ft.Row(
+        controls=[voltar_button],
+        alignment="start"
+    )
+
+    # --------------------------------------------------------------------------------------------------
 
     return ft.View(
         route="/cadastro",
         controls=[
             ft.Column(
-            [container],
-            alignment=ft.MainAxisAlignment.CENTER,
-            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-            expand=True
-        )
+                [
+                    header,        # Header com botão de voltar
+                    container      # Conteúdo principal
+                ],
+                alignment=ft.MainAxisAlignment.CENTER,
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                expand=True
+            )
         ],
         vertical_alignment="center",
         horizontal_alignment="center",
     )
-
 
 
