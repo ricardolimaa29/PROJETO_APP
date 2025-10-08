@@ -6,9 +6,9 @@ def PerfilView(page: ft.Page):
     page.theme_mode = "dark"
 
     # Forçar janela em proporção 9:16 (tipo celular)
-    page.window.width = 500
-    page.window.min_width = 500
-    page.window.max_width = 5000
+    page.window.width = 460
+    page.window.min_width = 460
+    page.window.max_width = 460
     page.window.height = 800
     page.window.min_height = 800
     page.window.max_height = 800
@@ -22,6 +22,21 @@ def PerfilView(page: ft.Page):
         "@tutanota.com", "@zoho.com", "@gmail.com"
     ]
 
+    # ---------- Funções ----------
+    def mudar_tema(e):
+        if page.theme_mode == ft.ThemeMode.DARK:
+            page.theme_mode = ft.ThemeMode.LIGHT
+            page.theme = ft.Theme(color_scheme_seed=ft.Colors.INDIGO)
+        else:
+            page.theme_mode = ft.ThemeMode.DARK
+            page.theme = ft.Theme(color_scheme_seed=ft.Colors.DEEP_ORANGE)
+        print(f"Tema alterado para: {page.theme_mode}")
+        page.update()
+
+    def clicou_menu(e):
+        item = e.control.text
+        print(f"Item clicado: {item}")
+
     def show_snackbar(message, color="RED"):
         page.open(ft.SnackBar(
             ft.Text(message, color="White"),
@@ -29,7 +44,33 @@ def PerfilView(page: ft.Page):
             duration=3000
         ))
 
-    # Foto de perfil
+    # ---------- Barra superior ----------
+    page.appbar = ft.AppBar(
+        leading=ft.IconButton(
+            ft.Icons.ARROW_BACK,
+            icon_color="white",
+            tooltip="Voltar",
+            on_click=lambda e: page.go("/home"),
+        ),
+        leading_width=40,
+        title=ft.Text("FÁBRICA DE PROGRAMADORES", weight="bold"),
+        center_title=True,
+        bgcolor=ft.Colors.SURFACE_CONTAINER_HIGHEST,
+        actions=[
+            ft.PopupMenuButton(
+                items=[
+                    ft.PopupMenuItem(text="TEMA", icon="WB_SUNNY_OUTLINED", on_click=mudar_tema),
+                    ft.PopupMenuItem(text="ACESSIBILIDADE", icon="ACCESSIBILITY", on_click=None),
+                    ft.PopupMenuItem(text="CONFIGURAÇÕES", icon="SETTINGS_OUTLINED", on_click=clicou_menu),
+                    ft.PopupMenuItem(text="SUPORTE", icon="HELP_OUTLINE_ROUNDED", on_click=clicou_menu),
+                    ft.PopupMenuItem(),
+                    ft.PopupMenuItem(text="SAIR", icon="CLOSE_ROUNDED", on_click=clicou_menu),
+                ]
+            ),
+        ],
+    )
+
+    # ---------- Foto de perfil ----------
     foto = ft.Image(src="perfil_default.png", fit=ft.ImageFit.COVER, width=120, height=120)
 
     foto_container = ft.Container(
@@ -78,7 +119,7 @@ def PerfilView(page: ft.Page):
         height=120,
     )
 
-    # Função para estilizar campos translúcidos
+    # ---------- Campos personalizados ----------
     def campo_personalizado(label, valor, read_only=True):
         return ft.Container(
             content=ft.TextField(
@@ -101,6 +142,7 @@ def PerfilView(page: ft.Page):
     nascimento_field = campo_personalizado("DATA DE NASCIMENTO", "01/01/2000")
     telefone_field = campo_personalizado("TELEFONE", "(11) 99999-9999")
 
+    # ---------- Funções de edição ----------
     def habilitar_edicao(e):
         for campo in [nome_field, email_field, telefone_field]:
             campo.content.read_only = False
@@ -140,43 +182,45 @@ def PerfilView(page: ft.Page):
         show_snackbar("Perfil atualizado com sucesso!", color="GREEN")
         page.update()
 
-    editar_button = ft.ElevatedButton("Editar Perfil", on_click=habilitar_edicao,bgcolor="white",color="black",width=100)
-    atualizar_button = ft.ElevatedButton("Atualizar Perfil", on_click=atualizar_perfil, visible=False,bgcolor="white",color="black",width=100)
+    # ---------- Botões ----------
+    editar_button = ft.ElevatedButton(
+        "Editar Perfil", on_click=habilitar_edicao,
+        bgcolor="white", color="black", width=100
+    )
+    atualizar_button = ft.ElevatedButton(
+        "Atualizar Perfil", on_click=atualizar_perfil,
+        visible=False, bgcolor="white", color="black", width=100
+    )
 
-    voltar_button = ft.IconButton(icon=ft.Icons.ARROW_BACK, icon_color="YELLOW", tooltip="Voltar")
-    header = ft.Row([voltar_button], alignment="start")
-
+    # ---------- Layout principal ----------
     return ft.View(
         route="/perfil",
         controls=[
-    
-        ft.Stack(
-            expand=True,
-            controls=[
-                ft.Image(
-                    src="Tecnologia 9_16.jpg",
-                    expand=True,              # ocupa todo espaço disponível
-                    fit=ft.ImageFit.COVER,    # cobre toda a tela
-                ),
-                ft.Column(
-                    controls=[
-                        header,
-                        ft.Container(height=20),
-                        foto_stack,
-                        nome_field,
-                        email_field,
-                        nascimento_field,
-                        telefone_field,
-                        ft.Row([editar_button, atualizar_button], alignment="center"),
-                    ],
-                    horizontal_alignment="center",
-                    alignment="start",
-                    spacing=20,
-                    scroll=ft.ScrollMode.AUTO
-                )
-            ]
-        )
-    
+            ft.Stack(
+                expand=True,
+                controls=[
+                    ft.Image(
+                        src="Tecnologia 9_16.jfif",
+                        expand=True,
+                        fit=ft.ImageFit.COVER,
+                    ),
+                    ft.Column(
+                        controls=[
+                            ft.Container(height=20),
+                            foto_stack,
+                            nome_field,
+                            email_field,
+                            nascimento_field,
+                            telefone_field,
+                            ft.Row([editar_button, atualizar_button], alignment="center"),
+                        ],
+                        horizontal_alignment="center",
+                        alignment="start",
+                        spacing=20,
+                        scroll=ft.ScrollMode.AUTO
+                    )
+                ]
+            )
         ],
         vertical_alignment="center",
         horizontal_alignment="center",
