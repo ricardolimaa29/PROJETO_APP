@@ -1,7 +1,7 @@
 import flet as ft
 import re
 
-def main(page: ft.Page):
+def PerfilView(page: ft.Page):
     page.title = "Tela de Perfil"
     page.theme_mode = "dark"
 
@@ -149,7 +149,7 @@ def main(page: ft.Page):
     return ft.View(
         route="/perfil",
         controls=[
-    page.add(
+    
         ft.Stack(
             expand=True,
             controls=[
@@ -176,7 +176,7 @@ def main(page: ft.Page):
                 )
             ]
         )
-    )
+    
         ],
         vertical_alignment="center",
         horizontal_alignment="center",

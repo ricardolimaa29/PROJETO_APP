@@ -3,6 +3,7 @@ from home import HomeView
 from login import LoginView
 from cadastro import CadastroView
 from notificação import View_notificacao
+from perfil import PerfilView
 
 # CRIAR UM BOTAO PARA INSERIR UM SITE DE PORTFOLIO PARA CADA DEV COM AS INFORMAÇÕES E O LINK PARA GIT
 
@@ -17,7 +18,7 @@ def main(page: ft.Page):
         if page.route == "/":
             page.views.append(LoginView(page))
         elif page.route == "/home":
-            page.views.append(HomeView().get_view(page))
+            page.views.append(HomeView(page))
         elif page.route == "/cadastro":
             page.views.append(CadastroView(page))
         elif page.route == "/notificacao":
