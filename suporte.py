@@ -13,7 +13,7 @@ def suporte_view(page: ft.Page):
     page.window.max_height = 800
     page.window.center()
     page.padding = 0
-    page.scroll = "auto"
+    page.scroll = "medio"
 
     # ---------- Cores ----------
     primary_color = ft.Colors.CYAN_400
