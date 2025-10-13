@@ -3,7 +3,7 @@ from flet import *
 import time
 import threading
 
-def Home(page: ft.Page):
+def HomeView(page: ft.Page):
     
     page.theme_mode = ft.ThemeMode.DARK 
     page.theme = ft.Theme(color_scheme_seed=ft.Colors.DEEP_ORANGE)
@@ -131,16 +131,17 @@ def Home(page: ft.Page):
         page.update()
 
     # ===================================== CRIANDO ELEMENTOS
-    page.appbar = ft.AppBar(
+    appbar = ft.AppBar(
         leading_width=10,
         title=ft.Text("FÁBRICA DE PROGRAMADORES", weight="bold"),
         center_title=True,
         bgcolor=ft.Colors.SURFACE_CONTAINER_HIGHEST,  
-        actions=[
+        actions=[ 
+                ft.IconButton(ft.Icons.HEARING, on_click=mudar_tema),
             ft.PopupMenuButton(
                 items=[
                     ft.PopupMenuItem(text="TEMA", icon="WB_SUNNY_OUTLINED", on_click=mudar_tema),
-                     ft.PopupMenuItem(text="ACESSIBILIDADE", icon="ACCESSIBILITY", on_click=...),
+                     ft.PopupMenuItem(text="ACESSIBILIDADE", icon="HEARING", on_click=...), # icon hearing
                     ft.PopupMenuItem(text="CONFIGURAÇÕES", icon="SETTINGS_OUTLINED", on_click=clicou_menu),
                     ft.PopupMenuItem(text="SUPORTE", icon="HELP_OUTLINE_ROUNDED", on_click=clicou_menu),
                     ft.PopupMenuItem(),
@@ -201,10 +202,54 @@ def Home(page: ft.Page):
     page.padding = 0
     page.add(perfil)
 
-    # NavBar inferior
-    page.navigation_bar = ft.NavigationBar(
-        selected_index=0,
+    from login import LoginView
+    from notificação import Notificacao_View
+    # home
+    from perfil import PerfilView
+
+     # Função para mudar de tela conforme índice do NavigationBar
     
+
+    def mudar_tela(num):
+        page.views.clear()
+        if num == 0:
+            page.views.append(Home(page))  # supondo que Home() é uma view
+        elif num == 1:
+            page.views.append(LoginView(page))
+        elif num == 2:
+            page.views.append(NotificacaoView(page))
+        elif num == 3:
+            page.views.append(PerfilView(page))
+        page.update()
+
+
+
+
+from login import LoginView
+    from notificação import Notificacao_View
+    # home
+    from perfil import PerfilView
+
+     # Função para mudar de tela conforme índice do NavigationBar
+    def mudar_tela(num):
+        page.views.clear()
+        if num == 0:
+            page.views.append(HomeView)  # supondo que Home() é uma view
+        elif num == 1:
+            page.views.append(LoginView)
+        elif num == 2:
+            page.views.append(NotificacaoView)
+        elif num == 3:
+            page.views.append(PerfilView)
+        page.update()
+
+
+
+
+
+    # Configurando o NavigationBar
+    navbar = ft.NavigationBar(
+        selected_index=0,
         destinations=[
             ft.NavigationBarDestination(
                 icon=ft.Icons.HOME_OUTLINED,
@@ -227,8 +272,10 @@ def Home(page: ft.Page):
                 label="Perfil"
             ),
         ],
-        on_change=lambda e: print(f"Você clicou na aba {e.control.selected_index}")
+        on_change=lambda e: mudar_tela(e.control.selected_index)
     )
+
+    page.update()
 
     # Função chamada ao clicar no container de material
     def abrir_materia(e):
@@ -380,5 +427,17 @@ def Home(page: ft.Page):
         eventos,
         links
     )
-ft.app(target=Home)
+    return ft.View(
+        route="/home",
+        controls=[
+            appbar,
+            carousel,
+            eventos,
+            links,
+            navbar
+            ],
+        vertical_alignment="center",
+        horizontal_alignment="center"
+    )
+
 

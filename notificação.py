@@ -9,7 +9,7 @@ class MessageManager:
     def add_to_inbox(self, message):
         self.inbox.append(message)
 
-def Notificacao_View (page: ft.Page):
+def NotificacaoView (page: ft.Page):
     page.title = "Fabrica de programadores"
     page.theme_mode = "dark"
     page.window.min_height = 900
@@ -317,7 +317,7 @@ def Notificacao_View (page: ft.Page):
     return ft.View(
         route = "/notificacao",
         controls=[
-
+    content_column
     ],
         vertical_alignment="center",
         horizontal_alignment="center"
