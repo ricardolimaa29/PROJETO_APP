@@ -4,7 +4,7 @@ def suporte_view(page: ft.Page):
     # ---------- Configurações básicas ----------
     page.title = "Suporte"
     page.theme_mode = ft.ThemeMode.DARK
-    page.theme = ft.Theme(color_scheme_seed=ft.Colors.CYAN)
+    page.theme = ft.Theme(color_scheme_seed=ft.Colors.DEEP_ORANGE)
     page.window.width = 500
     page.window.height = 800
     page.window.min_width = 500
@@ -16,8 +16,8 @@ def suporte_view(page: ft.Page):
     page.scroll = "medio"
 
     # ---------- Cores ----------
-    primary_color = ft.Colors.CYAN_400
-    card_color = ft.Colors.GREY_800
+    primary_color = ft.Colors.DEEP_ORANGE_300  # cor principal (laranja)
+    card_color = ft.Colors.GREY_600            # fundo dos cards / appbar mais escuro
 
     # ===================================== FUNÇÕES DO MENU =====================================
     def clicou_menu(e):
@@ -116,7 +116,7 @@ def suporte_view(page: ft.Page):
         horizontal_alignment=ft.CrossAxisAlignment.CENTER,
         expand=True,
     )
-
+    
     # ---------- Layout principal ----------
     return ft.View(
         route="/suporte",
@@ -185,7 +185,6 @@ def main(page: ft.Page):
                 )
             )
 
-    
     
     return ft.View(
     route="/suporte",
