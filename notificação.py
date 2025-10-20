@@ -8,8 +8,14 @@ class MessageManager:
         
     def add_to_inbox(self, message):
         self.inbox.append(message)
+    
+    def archive_message(self, message):
+        self.archived.append(message)
+    
+    def delete_message(self, message):
+        self.deleted.append(message)
 
-def NotificacaoView (page: ft.Page):
+def View_notificacao(page: ft.Page):
     page.title = "Fabrica de programadores"
     page.theme_mode = "dark"
     page.window.min_height = 900
@@ -50,7 +56,7 @@ def NotificacaoView (page: ft.Page):
             )
         ]
         
-        # Título centralizado
+        # Título centralizado NO TOPO
         header_row_controls.append(
             ft.Container(
                 ft.Row(
@@ -68,7 +74,7 @@ def NotificacaoView (page: ft.Page):
             )
         )
         
-        # Botões de navegação
+        # Botões de navegação NO TOPO (logo abaixo do título)
         buttons_row = []
         if current_view == "inbox":
             buttons_row = [
@@ -77,7 +83,10 @@ def NotificacaoView (page: ft.Page):
                 ft.ElevatedButton("Excluídas", width=100, bgcolor="none", color="white", 
                                 on_click=lambda e: show_deleted_messages()),
             ]
-        elif current_view == "deleted":
+        elif current_view == "archived":
+            # View de arquivadas - sem botões adicionais
+            buttons_row = []
+        else:  # current_view == "deleted"
             # View de excluídas - apenas botão esvaziar lixeira
             buttons_row = [
                 ft.ElevatedButton("Esvaziar Lixeira", width=120, bgcolor="red", color="white", 
@@ -94,7 +103,7 @@ def NotificacaoView (page: ft.Page):
         
         content_column.controls.append(ft.Divider(height=10))
    
-        # Lista de mensagens
+        # Lista de mensagens (agora vem depois dos botões)
         list_view = ft.ListView(expand=True)
         
         if current_view == "inbox":
@@ -124,7 +133,7 @@ def NotificacaoView (page: ft.Page):
                     content=ft.Text(empty_text, size=16, color=ft.Colors.GREY_400),
                     alignment=ft.alignment.center,
                     padding=20,
-                    height=200
+                    height=300 ##
                 )
             )
         
@@ -152,6 +161,7 @@ def NotificacaoView (page: ft.Page):
                 content=ft.Text("EXCLUIR", weight=ft.FontWeight.BOLD)
             ),
             on_dismiss=lambda e, msg=message: handle_dismiss(e, msg),
+            on_update=handle_update,
             on_confirm_dismiss=handle_confirm_dismiss,
             dismiss_thresholds={
                 ft.DismissDirection.END_TO_START: 0.3,
@@ -198,15 +208,27 @@ def NotificacaoView (page: ft.Page):
             title=ft.Text("Detalhes da Mensagem"),
             content=ft.Text(f"Conteúdo: {message}\n\nOrigem: {source}"),
             actions=[
-                ft.TextButton("Fechar", on_click=lambda e: close_dialog(details_dlg))
+                ft.TextButton("Fechar", on_click=lambda e: close_dialog_instantly(details_dlg))
             ]
         )
         page.open(details_dlg)
 
+    def delete_archived_message(message):
+        try:
+            message_to_remove = next(msg for msg in message_manager.archived if msg == message)
+            message_manager.archived.remove(message_to_remove)
+            message_manager.deleted.append(message_to_remove)
+            update_view()
+        except (ValueError, StopIteration):
+            update_view()
+
     def restore_archived_message(message):
-        if message in message_manager.archived:
-            message_manager.archived.remove(message)
-            message_manager.inbox.append(message)
+        try:
+            message_to_restore = next(msg for msg in message_manager.archived if msg == message)
+            message_manager.archived.remove(message_to_restore)
+            message_manager.inbox.append(message_to_restore)
+            update_view()
+        except (ValueError, StopIteration):
             update_view()
 
     def restore_deleted_message(message):
@@ -217,38 +239,67 @@ def NotificacaoView (page: ft.Page):
 
     def confirm_empty_trash():
         if len(message_manager.deleted) == 0:
+            # Se a lixeira já estiver vazia, mostra um aviso
             empty_dlg = ft.AlertDialog(
                 title=ft.Text("Lixeira Vazia"),
                 content=ft.Text("A lixeira já está vazia."),
-                actions=[ft.TextButton("OK", on_click=lambda e: close_dialog(empty_dlg))]
+                actions=[ft.TextButton("OK", on_click=lambda e: close_dialog_instantly(empty_dlg))]
             )
             page.open(empty_dlg)
         else:
+            # Confirmação para esvaziar lixeira
             confirm_dlg = ft.AlertDialog(
                 modal=True,
                 title=ft.Text("Esvaziar Lixeira"),
                 content=ft.Text(f"Tem certeza que deseja esvaziar a lixeira?\n\nIsso irá excluir permanentemente {len(message_manager.deleted)} mensagem(ns).\n\nEsta ação não pode ser desfeita."),
                 actions=[
-                    ft.TextButton("Sim", on_click=lambda e: handle_empty_trash(confirm_dlg)),
-                    ft.TextButton("Cancelar", on_click=lambda e: close_dialog(confirm_dlg)),
+                    ft.TextButton("Sim", on_click=lambda e: handle_empty_trash()),
+                    ft.TextButton("Cancelar", on_click=lambda e: close_dialog_instantly(confirm_dlg)),
                 ],
                 actions_alignment=ft.MainAxisAlignment.CENTER,
             )
             page.open(confirm_dlg)
 
-    def handle_empty_trash(dialog):
+    def handle_empty_trash():
+        # Esvazia a lixeira
         message_manager.deleted.clear()
-        close_dialog(dialog)
-        update_view()  # Apenas atualiza a view, mantendo na tela atual (deleted)
+        # Fecha o diálogo instantaneamente
+        close_all_dialogs()
+        # Volta automaticamente para a caixa de entrada
+        show_inbox()
 
-    def close_dialog(dialog):
-        page.close(dialog)
+    def confirm_permanent_delete(message):
+        confirm_dlg = ft.AlertDialog(
+            modal=True,
+            title=ft.Text("Exclusão Permanente"),
+            content=ft.Text(f"Tem certeza que deseja excluir permanentemente:\n\"{message}\"?\n\nEsta ação não pode ser desfeita."),
+            actions=[
+                ft.TextButton("Sim", data=message, on_click=handle_permanent_delete),
+                ft.TextButton("Cancelar", on_click=lambda e: close_dialog_instantly(confirm_dlg)),
+            ],
+            actions_alignment=ft.MainAxisAlignment.CENTER,
+        )
+        page.open(confirm_dlg)
+
+    def handle_permanent_delete(e):
+        message = e.control.data
+        if message in message_manager.deleted:
+            message_manager.deleted.remove(message)
+            print(f"Item {message} excluído permanentemente.")
+            # Fecha o diálogo instantaneamente
+            close_all_dialogs()
+            show_inbox()
 
     def go_back():
         if current_view == "inbox":
-            page.window_close()
+            page.go("/home")
         else:
             show_inbox()
+
+    def show_home():
+        nonlocal current_view
+        current_view = "inbox"
+        update_view()
 
     def show_archived_messages():
         nonlocal current_view
@@ -270,12 +321,23 @@ def NotificacaoView (page: ft.Page):
         dismissible_control = dlg.data["control"]
         message = dlg.data["message"]
         
-        page.close(dlg)
+        # Fecha o diálogo instantaneamente
+        close_dialog_instantly(dlg)
         
         if user_confirmed:
             dismissible_control.confirm_dismiss(True)
         else:
             dismissible_control.confirm_dismiss(False)
+
+    # Função para fechar diálogo instantaneamente
+    def close_dialog_instantly(dialog):
+        page.close(dialog)
+
+    # Função para fechar todos os diálogos
+    def close_all_dialogs():
+        # Fecha qualquer diálogo aberto
+        if hasattr(page, 'dialog') and page.dialog:
+            page.close(page.dialog)
 
     dlg = ft.AlertDialog(
         modal=True,
@@ -298,16 +360,21 @@ def NotificacaoView (page: ft.Page):
 
     def handle_dismiss(e: ft.DismissibleDismissEvent, message):
         if e.direction == ft.DismissDirection.START_TO_END:
+            print(f"Item {message} arquivado.")
             message_manager.inbox.remove(message)
             message_manager.archived.append(message)
         elif e.direction == ft.DismissDirection.END_TO_START:
+            print(f"Item {message} excluído.")
             message_manager.inbox.remove(message)
             message_manager.deleted.append(message)
         
         update_view()
 
-    content_column = ft.Column()
+    def handle_update(e: ft.DismissibleUpdateEvent):
+        pass
 
+    content_column = ft.Column()
+    
     # Adiciona o conteúdo à página
     page.add(content_column)
     
@@ -315,10 +382,8 @@ def NotificacaoView (page: ft.Page):
     update_view()
 
     return ft.View(
-        route = "/notificacao",
-        controls=[
-    content_column
-    ],
+        route="/notificação",
+        controls=[content_column],
         vertical_alignment="center",
         horizontal_alignment="center"
-)
+    )
