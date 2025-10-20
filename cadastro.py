@@ -346,7 +346,7 @@ def CadastroView(page:ft.Page):
     # Botão de voltar e header
     voltar_button = ft.IconButton(
         icon="ARROW_BACK",
-        icon_color="YELLOW",
+        icon_color="WHITE",
         tooltip="Voltar",
         on_click=lambda e: page.go("/login"),
     )
