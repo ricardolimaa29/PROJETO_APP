@@ -2,7 +2,9 @@ import flet as ft
 from flet import *
 import time
 import threading
-
+from gtts import gTTS
+import pygame
+import os 
 def HomeView(page: ft.Page):
     
     page.theme_mode = ft.ThemeMode.DARK 
@@ -15,14 +17,23 @@ def HomeView(page: ft.Page):
     page.window.min_width = 500
     page.window.min_height = 800
     page.scroll = 'auto'
-
+    def falar(texto, arquivo="saida.mp3", lang="pt-br", slow=False, apagar=True):
+        tts = gTTS(text=texto, lang=lang, slow=slow)
+        tts.save(arquivo)
+        pygame.mixer.init()
+        pygame.mixer.music.load(arquivo)
+        pygame.mixer.music.play()
+        while pygame.mixer.music.get_busy():
+            pygame.time.Clock().tick(10)
+        pygame.mixer.quit()
+        if apagar and os.path.exists(arquivo):
+            os.remove(arquivo)
 
     # CARROSSEL MELHORADO
     carousel_images = [
         r"img\fabrica-programadores-parnaiba.png", 
         r"img\sala.jpg", 
         r"img\gaby.jpg",
-        
         r"img\fabrica.jpg"
     ]
     carousel_index = 0
@@ -62,9 +73,6 @@ def HomeView(page: ft.Page):
     # Iniciar thread do auto-play
     threading.Thread(target=auto_play, daemon=True).start()
 
-    # Botões do carrossel mais elegantes
-  
-
     # Indicadores (dots) mais modernos
     dots = ft.Row(
         controls=[
@@ -86,7 +94,6 @@ def HomeView(page: ft.Page):
             controls=[
                 carousel_image,
                 ft.Row(
-                    
                     alignment="spaceBetween",
                     vertical_alignment="center",
                     height=200
@@ -111,14 +118,18 @@ def HomeView(page: ft.Page):
     )
 
     # ===================================== CRIANDO FUNÇÕES DOS ELEMENTOS
-    def clicou_menu(e):
-        item = e.control.text
-        if item == "Suporte":
-            print("Abrir suporte...")
-        elif item == "Configurações":
-            print("Abrir configurações...")
-        elif item == "Tema":
-            mudar_tema(None)
+    
+    # FUNÇÃO PARA IR PARA O PERFIL
+    def ir_para_perfil(e):
+        page.go("/perfil")
+
+    # FUNÇÃO PARA IR PARA AS AULAS
+    def ir_para_aulas(e):
+        page.go("/aulasView")
+
+    # FUNÇÃO PARA IR PARA O SUPORTE - CORRIGIDA
+    def ir_para_suporte(e):
+        page.go("/suporte")  # CORRIGIDO: de "/suporte_view" para "/suporte"
 
     def mudar_tema(e):
         if page.theme_mode == ft.ThemeMode.DARK:
@@ -137,20 +148,21 @@ def HomeView(page: ft.Page):
         center_title=True,
         bgcolor=ft.Colors.SURFACE_CONTAINER_HIGHEST,  
         actions=[ 
-                ft.IconButton(ft.Icons.HEARING, on_click=mudar_tema),
+                ft.IconButton(ft.Icons.HEARING, on_click=lambda e: falar("Bom dia,no canto superior direito temos o menu com as opções de tema,acessibilidade,configurações e suporte,no centro temos um botão de editar perfil,logo em seguida temos o material do curso e no canto inferior do smartphone temos as notificaçoes do aplicativo e embaixo no canto inferior temos o início,desempenho,notificações e também o perfil.")),
             ft.PopupMenuButton(
                 items=[
                     ft.PopupMenuItem(text="TEMA", icon="WB_SUNNY_OUTLINED", on_click=mudar_tema),
-                     ft.PopupMenuItem(text="ACESSIBILIDADE", icon="HEARING", on_click=...), # icon hearing
-                    ft.PopupMenuItem(text="CONFIGURAÇÕES", icon="SETTINGS_OUTLINED", on_click=clicou_menu),
-                    ft.PopupMenuItem(text="SUPORTE", icon="HELP_OUTLINE_ROUNDED", on_click=clicou_menu),
+                    ft.PopupMenuItem(text="ACESSIBILIDADE", icon="SUN", on_click=mudar_tema), # icon hearing
+                    ft.PopupMenuItem(text="CONFIGURAÇÕES", icon="SETTINGS_OUTLINED", on_click=...),
+                    ft.PopupMenuItem(text="SUPORTE", icon="HELP_OUTLINE_ROUNDED", on_click=ir_para_suporte),  # AGORA FUNCIONA
                     ft.PopupMenuItem(),
-                    ft.PopupMenuItem(text="SAIR", icon="CLOSE_ROUNDED", on_click=clicou_menu),        
+                    ft.PopupMenuItem(text="SAIR", icon="CLOSE_ROUNDED", on_click=...),        
                 ]
             ),
         ],
     )
-     # PERFIL
+    
+    # PERFIL
     perfil = ft.Container(
         content=ft.Row(
             spacing=20,
@@ -181,7 +193,8 @@ def HomeView(page: ft.Page):
                             style=ft.ButtonStyle(
                                 padding=ft.padding.symmetric(horizontal=20, vertical=10),
                                 shape=ft.RoundedRectangleBorder(radius=10)
-                            )
+                            ),
+                            on_click=ir_para_perfil
                         )
                     ]
                 )
@@ -199,53 +212,17 @@ def HomeView(page: ft.Page):
         )
     )
 
-    page.padding = 0
-    page.add(perfil)
-
-    from login import LoginView
-    from notificação import Notificacao_View
-    # home
-    from perfil import PerfilView
-
-     # Função para mudar de tela conforme índice do NavigationBar
-    
-
-    def mudar_tela(num):
-        page.views.clear()
-        if num == 0:
-            page.views.append(Home(page))  # supondo que Home() é uma view
-        elif num == 1:
-            page.views.append(LoginView(page))
-        elif num == 2:
-            page.views.append(NotificacaoView(page))
-        elif num == 3:
-            page.views.append(PerfilView(page))
-        page.update()
-
-
-
-
-from login import LoginView
-    from notificação import Notificacao_View
-    # home
-    from perfil import PerfilView
-
-     # Função para mudar de tela conforme índice do NavigationBar
-    def mudar_tela(num):
-        page.views.clear()
-        if num == 0:
-            page.views.append(HomeView)  # supondo que Home() é uma view
-        elif num == 1:
-            page.views.append(LoginView)
-        elif num == 2:
-            page.views.append(NotificacaoView)
-        elif num == 3:
-            page.views.append(PerfilView)
-        page.update()
-
-
-
-
+    # Função para mudar de tela conforme índice do NavigationBar
+    def mudar_tela(e):
+        index = e.control.selected_index
+        if index == 0:
+            page.go("/home")
+        elif index == 1:
+            page.go("/desempenho")
+        elif index == 2:
+            page.go("/notificação")
+        elif index == 3:
+            page.go("/perfil")
 
     # Configurando o NavigationBar
     navbar = ft.NavigationBar(
@@ -272,26 +249,15 @@ from login import LoginView
                 label="Perfil"
             ),
         ],
-        on_change=lambda e: mudar_tela(e.control.selected_index)
+        on_change=mudar_tela
     )
 
-    page.update()
-
-    # Função chamada ao clicar no container de material
-    def abrir_materia(e):
-        page.snack_bar = ft.SnackBar(
-            ft.Text("Abrindo material do curso..."),
-            bgcolor=ft.Colors.DEEP_ORANGE
-        )
-        page.snack_bar.open = True
-        page.update()
-
-    # Container de MATERIAL DO CURSO 
+    # Container de MATERIAL DO CURSO
     eventos = ft.Container(
-        on_click=abrir_materia,
+        on_click=ir_para_aulas,  # ABRE A TELA DE AULAS
         ink=True,
         content=ft.Column(
-        alignment=ft.alignment.center, 
+            alignment=ft.alignment.center, 
             spacing=15,
             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
             controls=[
@@ -299,13 +265,13 @@ from login import LoginView
                 ft.Container(
                     content=ft.Column([
                         ft.ListTile(
-                            leading=ft.Image(src="img\python.jpg"),
+                            leading=ft.Image(src=r"img\python.jpg"),
                             title=ft.Text("AULAS DE PYTHON", weight="bold"),
                             subtitle=ft.Text("70% DE APROVEITAMENTO DAS AULAS"),
                             trailing=ft.Icon(ft.Icons.CHECK_CIRCLE_ROUNDED, color=ft.Colors.GREEN)
                         ),
                         ft.ListTile(
-                            leading=ft.Image(src="img/api.jpg"),
+                            leading=ft.Image(src=r"img\api.jpg"),
                             title=ft.Text("AULAS DE API", weight="bold"),
                             subtitle=ft.Text("30% DE APROVEITAMENTO DAS AULAS"),
                             trailing=ft.Container(
@@ -331,10 +297,15 @@ from login import LoginView
             color=ft.Colors.BLACK26,
             offset=ft.Offset(0, 2)
         ),
-        # Efeito visual de hover para parecer um botão
         animate=ft.Animation(200, "easeInOut"),
-        on_hover=lambda e: eventos.__setattr__("bgcolor", ft.Colors.SURFACE_CONTAINER_HIGH if e.data == "true" else ft.Colors.SURFACE_CONTAINER_HIGHEST)
     )
+
+    # Função para tratar hover
+    def on_hover_eventos(e):
+        eventos.bgcolor = ft.Colors.SURFACE_CONTAINER_HIGHEST if e.data == "true" else ft.Colors.SURFACE_CONTAINER_HIGHEST
+        page.update()
+
+    eventos.on_hover = on_hover_eventos
 
     # Função para abrir links externos
     def abrir_link(e, url):
@@ -358,7 +329,7 @@ from login import LoginView
                             controls=[
                                 ft.Container(
                                     content=ft.Image(
-                                        src="img\santana.png",  
+                                        src=r"img\santana.png",  
                                         width=70,
                                         height=70,
                                         fit=ft.ImageFit.COVER
@@ -378,7 +349,7 @@ from login import LoginView
                             controls=[
                                 ft.Container(
                                     content=ft.Image(
-                                        src="img\portifolio.jpg",  # Corrigido: use / em vez de \
+                                        src=r"img\portifolio.jpg",
                                         width=70,
                                         height=70,
                                         fit=ft.ImageFit.COVER
@@ -398,7 +369,7 @@ from login import LoginView
                             controls=[
                                 ft.Container(
                                     content=ft.Image(
-                                        src="img\senai.jpg",  # Corrigido: use / em vez de \
+                                        src=r"img\senai.jpg",
                                         width=70,
                                         height=70,
                                         fit=ft.ImageFit.COVER
@@ -421,23 +392,17 @@ from login import LoginView
         border_radius=15,
         bgcolor=ft.Colors.SURFACE_CONTAINER_HIGHEST
     )
-    # Adicionar todos os componentes à página
-    page.add(
-        carousel,
-        eventos,
-        links
-    )
+    
     return ft.View(
         route="/home",
         controls=[
             appbar,
+            perfil,
             carousel,
             eventos,
             links,
             navbar
-            ],
+        ],
         vertical_alignment="center",
         horizontal_alignment="center"
     )
-
-
