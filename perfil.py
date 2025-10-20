@@ -81,7 +81,9 @@ def PerfilView(page: ft.Page):
         width=120,
         height=120,
         border_radius=60,
-        clip_behavior=ft.ClipBehavior.HARD_EDGE
+        clip_behavior=ft.ClipBehavior.HARD_EDGE,
+       
+        bgcolor=ft.Colors.BLACK,
     )
 
     def foto_escolhida(e: ft.FilePickerResultEvent):
@@ -120,6 +122,19 @@ def PerfilView(page: ft.Page):
         ],
         width=120,
         height=120,
+    )
+
+# Moldura para o file picker / foto de perfil
+    foto_moldura = ft.Container(
+        content=foto_stack,
+        padding=6,
+        border=ft.border.all(2, ft.Colors.WHITE24),
+        border_radius=70,
+        width=132,
+        height=132,
+        alignment=ft.alignment.center,
+        # Mantém o interior preto para a moldura conforme pedido
+        bgcolor=ft.Colors.BLACK,
     )
 
     # ---------- Campos personalizados ----------
@@ -210,16 +225,14 @@ def PerfilView(page: ft.Page):
             ft.Stack(
                 expand=True,
                 controls=[
-                    ft.Image(
-                        src="img\Tecnologia 9_16.jfif",
+                    ft.Container(
                         expand=True,
-                        fit=ft.ImageFit.COVER,
+                        bgcolor=ft.Colors.TRANSPARENT,
                     ),
-                   
                     ft.Column(
                         controls=[ft.Row([voltar_button], alignment="left"),
                             ft.Container(height=20),
-                            foto_stack,
+                            foto_moldura,
                             nome_field,
                             email_field,
                             nascimento_field,
