@@ -6,9 +6,9 @@ def PerfilView(page: ft.Page):
     page.theme_mode = "dark"
 
     # Forçar janela em proporção 9:16 (tipo celular)
-    page.window.width = 460
-    page.window.min_width = 460
-    page.window.max_width = 460
+    page.window.width = 500
+    page.window.min_width = 500
+    page.window.max_width = 500
     page.window.height = 800
     page.window.min_height = 800
     page.window.max_height = 800
@@ -23,6 +23,9 @@ def PerfilView(page: ft.Page):
     ]
 
     # ---------- Funções ----------
+    def voltar(e):
+        page.go("/home")
+
     def mudar_tema(e):
         if page.theme_mode == ft.ThemeMode.DARK:
             page.theme_mode = ft.ThemeMode.LIGHT
@@ -192,6 +195,14 @@ def PerfilView(page: ft.Page):
         visible=False, bgcolor="white", color="black", width=100
     )
 
+    # ---------- Botão de voltar como seta no canto superior esquerdo ----------
+    voltar_button = ft.IconButton(
+        icon="ARROW_BACK",
+        icon_color="WHITE",
+        tooltip="Voltar",
+        on_click=lambda e: page.go("/home"),
+    )
+
     # ---------- Layout principal ----------
     return ft.View(
         route="/perfil",
@@ -200,12 +211,13 @@ def PerfilView(page: ft.Page):
                 expand=True,
                 controls=[
                     ft.Image(
-                        src="Tecnologia 9_16.jfif",
+                        src="img\Tecnologia 9_16.jfif",
                         expand=True,
                         fit=ft.ImageFit.COVER,
                     ),
+                   
                     ft.Column(
-                        controls=[
+                        controls=[ft.Row([voltar_button], alignment="left"),
                             ft.Container(height=20),
                             foto_stack,
                             nome_field,
