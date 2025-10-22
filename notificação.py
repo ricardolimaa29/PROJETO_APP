@@ -243,28 +243,47 @@ def View_notificacao(page: ft.Page):
             empty_dlg = ft.AlertDialog(
                 title=ft.Text("Lixeira Vazia"),
                 content=ft.Text("A lixeira já está vazia."),
-                actions=[ft.TextButton("OK", on_click=lambda e: close_dialog_instantly(empty_dlg))]
+                actions=[ft.TextButton("OK", on_click=lambda e: page.close(empty_dlg))]
             )
             page.open(empty_dlg)
         else:
-            # Confirmação para esvaziar lixeira
+            # Confirmação para esvaziar lixeira - VERSÃO SIMPLES
+            def handle_confirm(e):
+                page.close(confirm_dlg)
+                # Esvazia a lixeira
+                message_manager.deleted.clear()
+                # Volta para a caixa de entrada
+                show_inbox()
+
+        # Função para fechar diálogo instantaneamente
+            def close_dialog_instantly(dialog):
+                page.close(dialog)
+
+            def handle_cancel(e):
+                page.close(confirm_dlg)
+            
             confirm_dlg = ft.AlertDialog(
                 modal=True,
                 title=ft.Text("Esvaziar Lixeira"),
                 content=ft.Text(f"Tem certeza que deseja esvaziar a lixeira?\n\nIsso irá excluir permanentemente {len(message_manager.deleted)} mensagem(ns).\n\nEsta ação não pode ser desfeita."),
                 actions=[
-                    ft.TextButton("Sim", on_click=lambda e: handle_empty_trash()),
-                    ft.TextButton("Cancelar", on_click=lambda e: close_dialog_instantly(confirm_dlg)),
+                    ft.TextButton("Sim", on_click=handle_confirm),
+                    ft.TextButton("Cancelar", on_click=handle_cancel),
                 ],
                 actions_alignment=ft.MainAxisAlignment.CENTER,
             )
             page.open(confirm_dlg)
 
+    # REMOVA completamente a função handle_empty_trash() original
+    # E REMOVA as chamadas a close_dialog_instantly e close_all_dialogs
+       
+
     def handle_empty_trash():
         # Esvazia a lixeira
         message_manager.deleted.clear()
-        # Fecha o diálogo instantaneamente
-        close_all_dialogs()
+        # Fecha o diálogo de confirmação atual
+        page.dialog.open = False
+        page.update()
         # Volta automaticamente para a caixa de entrada
         show_inbox()
 
@@ -286,8 +305,9 @@ def View_notificacao(page: ft.Page):
         if message in message_manager.deleted:
             message_manager.deleted.remove(message)
             print(f"Item {message} excluído permanentemente.")
-            # Fecha o diálogo instantaneamente
-            close_all_dialogs()
+            # Fecha o diálogo atual
+            page.dialog.open = False
+            page.update()
             show_inbox()
 
     def go_back():
@@ -331,13 +351,15 @@ def View_notificacao(page: ft.Page):
 
     # Função para fechar diálogo instantaneamente
     def close_dialog_instantly(dialog):
-        page.close(dialog)
+        dialog.open = False
+        page.update()
 
     # Função para fechar todos os diálogos
     def close_all_dialogs():
         # Fecha qualquer diálogo aberto
         if hasattr(page, 'dialog') and page.dialog:
-            page.close(page.dialog)
+            page.dialog.open = False
+            page.update()
 
     dlg = ft.AlertDialog(
         modal=True,
