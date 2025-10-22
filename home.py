@@ -3,38 +3,23 @@ from flet import *
 import time
 import threading
 from gtts import gTTS
-import pygame
+
 import os 
 def HomeView(page: ft.Page):
     
     page.theme_mode = ft.ThemeMode.DARK 
     page.theme = ft.Theme(color_scheme_seed=ft.Colors.DEEP_ORANGE)
     page.title = "PROGRAMADORES"
-    page.window.width = 500
-    page.window.height = 800
-    page.window.max_width = 500
-    page.window.max_height = 800
-    page.window.min_width = 500
-    page.window.min_height = 800
+
     page.scroll = 'auto'
-    def falar(texto, arquivo="saida.mp3", lang="pt-br", slow=False, apagar=True):
-        tts = gTTS(text=texto, lang=lang, slow=slow)
-        tts.save(arquivo)
-        pygame.mixer.init()
-        pygame.mixer.music.load(arquivo)
-        pygame.mixer.music.play()
-        while pygame.mixer.music.get_busy():
-            pygame.time.Clock().tick(10)
-        pygame.mixer.quit()
-        if apagar and os.path.exists(arquivo):
-            os.remove(arquivo)
+
 
     # CARROSSEL MELHORADO
     carousel_images = [
-        r"img\fabrica-programadores-parnaiba.png", 
-        r"img\sala.jpg", 
-        r"img\gaby.jpg",
-        r"img\fabrica.jpg"
+        r"Fabrica_app\src\img\fabrica-programadores-parnaiba.png", 
+        r"Fabrica_app\src\img\sala.jpg", 
+        r"Fabrica_app\src\img\gaby.jpg",
+        r"Fabrica_app\src\img\fabrica.jpg"
     ]
     carousel_index = 0
 
@@ -148,7 +133,7 @@ def HomeView(page: ft.Page):
         center_title=True,
         bgcolor=ft.Colors.SURFACE_CONTAINER_HIGHEST,  
         actions=[ 
-                ft.IconButton(ft.Icons.HEARING, on_click=lambda e: falar("Bom dia,no canto superior direito temos o menu com as opções de tema,acessibilidade,configurações e suporte,no centro temos um botão de editar perfil,logo em seguida temos o material do curso e no canto inferior do smartphone temos as notificaçoes do aplicativo e embaixo no canto inferior temos o início,desempenho,notificações e também o perfil.")),
+                ft.IconButton(ft.Icons.HEARING,),
             ft.PopupMenuButton(
                 items=[
                     ft.PopupMenuItem(text="TEMA", icon="WB_SUNNY_OUTLINED", on_click=mudar_tema),
@@ -170,7 +155,7 @@ def HomeView(page: ft.Page):
                 # Container da foto de perfil
                 ft.Container(
                     content=ft.Image(
-                        src=r"img\arthur.jpg",  # Caminho da imagem
+                        src=r"Fabrica_app\src\img\perfil.png",
                         width=110,
                         height=110,
                         fit=ft.ImageFit.COVER,
@@ -265,13 +250,13 @@ def HomeView(page: ft.Page):
                 ft.Container(
                     content=ft.Column([
                         ft.ListTile(
-                            leading=ft.Image(src=r"img\python.jpg"),
+                            leading=ft.Image(src=r"Fabrica_app\src\img\python.jpg"),
                             title=ft.Text("AULAS DE PYTHON", weight="bold"),
                             subtitle=ft.Text("70% DE APROVEITAMENTO DAS AULAS"),
                             trailing=ft.Icon(ft.Icons.CHECK_CIRCLE_ROUNDED, color=ft.Colors.GREEN)
                         ),
                         ft.ListTile(
-                            leading=ft.Image(src=r"img\api.jpg"),
+                            leading=ft.Image(src=r"Fabrica_app\src\img\api.jpg"),
                             title=ft.Text("AULAS DE API", weight="bold"),
                             subtitle=ft.Text("30% DE APROVEITAMENTO DAS AULAS"),
                             trailing=ft.Container(
@@ -329,7 +314,7 @@ def HomeView(page: ft.Page):
                             controls=[
                                 ft.Container(
                                     content=ft.Image(
-                                        src=r"img\santana.png",  
+                                        src=r"Fabrica_app\src\img\santana.png",  
                                         width=70,
                                         height=70,
                                         fit=ft.ImageFit.COVER
@@ -349,7 +334,7 @@ def HomeView(page: ft.Page):
                             controls=[
                                 ft.Container(
                                     content=ft.Image(
-                                        src=r"img\portifolio.jpg",
+                                        src=r"Fabrica_app\src\img\portifolio.jpg",
                                         width=70,
                                         height=70,
                                         fit=ft.ImageFit.COVER
@@ -369,7 +354,7 @@ def HomeView(page: ft.Page):
                             controls=[
                                 ft.Container(
                                     content=ft.Image(
-                                        src=r"img\senai.jpg",
+                                        src=r"Fabrica_app\src\img\senai.jpg",
                                         width=70,
                                         height=70,
                                         fit=ft.ImageFit.COVER
@@ -393,14 +378,25 @@ def HomeView(page: ft.Page):
         bgcolor=ft.Colors.SURFACE_CONTAINER_HIGHEST
     )
     
-    return ft.View(
-        route="/home",
+    # MAIN CONTENT COM LISTVIEW (ADICIONADO)
+    main_content = ft.ListView(
         controls=[
-            appbar,
             perfil,
             carousel,
             eventos,
             links,
+        ],
+        spacing=10,
+        padding=20,
+        auto_scroll=True,
+        expand=True,
+    )
+    
+    return ft.View(
+        route="/home",
+        controls=[
+            appbar,
+            main_content,  # SUBSTITUÍDO OS CONTROLES INDIVIDUAIS PELA LISTVIEW
             navbar
         ],
         vertical_alignment="center",
