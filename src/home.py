@@ -3,17 +3,19 @@ from flet import *
 import time
 import threading
 from gtts import gTTS
-
 import os 
+
 def HomeView(page: ft.Page):
     
     page.theme_mode = ft.ThemeMode.DARK 
     page.theme = ft.Theme(color_scheme_seed=ft.Colors.DEEP_ORANGE)
     page.title = "PROGRAMADORES"
 
-    page.scroll = 'auto'
-
-
+    # Configurações da página
+    page.scroll = "always"
+    page.padding = 0
+    page.spacing = 0
+ 
     # CARROSSEL MELHORADO
     carousel_images = [
         r"Fabrica_app\src\img\fabrica-programadores-parnaiba.png", 
@@ -49,13 +51,13 @@ def HomeView(page: ft.Page):
         carousel_index = (carousel_index - 1) % len(carousel_images)
         update_carousel()
 
-    # Auto-play do carrossel
+    # Auto-play do carrossel com animação suave
     def auto_play():
         while True:
             time.sleep(4)
             next_slide()
 
-    # Iniciar thread do auto-play
+    # Iniciar thread do auto-play em background
     threading.Thread(target=auto_play, daemon=True).start()
 
     # Indicadores (dots) mais modernos
@@ -104,26 +106,53 @@ def HomeView(page: ft.Page):
 
     # ===================================== CRIANDO FUNÇÕES DOS ELEMENTOS
     
-    # FUNÇÃO PARA IR PARA O PERFIL
+    # Funções de navegação com efeito de transição
     def ir_para_perfil(e):
+        page.views.append(
+            ft.View(
+                route="/perfil",
+                transition=ft.PageTransition.FADE,
+                transition_duration=300
+            )
+        )
         page.go("/perfil")
 
-    # FUNÇÃO PARA IR PARA AS AULAS
     def ir_para_aulas(e):
+        page.views.append(
+            ft.View(
+                route="/aulasView",
+                transition=ft.PageTransition.FADE,
+                transition_duration=300
+            )
+        )
         page.go("/aulasView")
 
-    # FUNÇÃO PARA IR PARA O SUPORTE - CORRIGIDA
     def ir_para_suporte(e):
-        page.go("/suporte")  # CORRIGIDO: de "/suporte_view" para "/suporte"
+        page.views.append(
+            ft.View(
+                route="/suporte",
+                transition=ft.PageTransition.FADE,
+                transition_duration=300
+            )
+        )
+        page.go("/suporte")
 
+    # Função para alternar tema com animação
     def mudar_tema(e):
-        if page.theme_mode == ft.ThemeMode.DARK:
-            page.theme_mode = ft.ThemeMode.LIGHT
-            page.theme = ft.Theme(color_scheme_seed=ft.Colors.INDIGO)
-        else:
-            page.theme_mode = ft.ThemeMode.DARK
-            page.theme = ft.Theme(color_scheme_seed=ft.Colors.DEEP_ORANGE)
-        print(f"Tema alterado para: {page.theme_mode}")
+        with page.batch_update():
+            if page.theme_mode == ft.ThemeMode.DARK:
+                page.theme_mode = ft.ThemeMode.LIGHT
+                page.theme = ft.Theme(
+                    color_scheme_seed=ft.colors.INDIGO,
+                    visual_density=ft.ThemeVisualDensity.COMFORTABLE
+                )
+            else:
+                page.theme_mode = ft.ThemeMode.DARK
+                page.theme = ft.Theme(
+                    color_scheme_seed=ft.colors.DEEP_ORANGE,
+                    visual_density=ft.ThemeVisualDensity.COMFORTABLE
+                )
+        # Atualiza a UI com animação
         page.update()
 
     # ===================================== CRIANDO ELEMENTOS
@@ -137,9 +166,9 @@ def HomeView(page: ft.Page):
             ft.PopupMenuButton(
                 items=[
                     ft.PopupMenuItem(text="TEMA", icon="WB_SUNNY_OUTLINED", on_click=mudar_tema),
-                    ft.PopupMenuItem(text="ACESSIBILIDADE", icon="SUN", on_click=mudar_tema), # icon hearing
+                    ft.PopupMenuItem(text="ACESSIBILIDADE", icon="SUN", on_click=mudar_tema),
                     ft.PopupMenuItem(text="CONFIGURAÇÕES", icon="SETTINGS_OUTLINED", on_click=...),
-                    ft.PopupMenuItem(text="SUPORTE", icon="HELP_OUTLINE_ROUNDED", on_click=ir_para_suporte),  # AGORA FUNCIONA
+                    ft.PopupMenuItem(text="SUPORTE", icon="HELP_OUTLINE_ROUNDED", on_click=ir_para_suporte),
                     ft.PopupMenuItem(),
                     ft.PopupMenuItem(text="SAIR", icon="CLOSE_ROUNDED", on_click=...),        
                 ]
@@ -162,8 +191,8 @@ def HomeView(page: ft.Page):
                     ),
                     width=110,
                     height=110,
-                    border_radius=55,  # Torna circular
-                    clip_behavior=ft.ClipBehavior.HARD_EDGE,  # Importante para border_radius funcionar
+                    border_radius=55,
+                    clip_behavior=ft.ClipBehavior.HARD_EDGE,
                 ),
                 # Coluna com informações do usuário
                 ft.Column(
@@ -197,18 +226,6 @@ def HomeView(page: ft.Page):
         )
     )
 
-    # Função para mudar de tela conforme índice do NavigationBar
-    def mudar_tela(e):
-        index = e.control.selected_index
-        if index == 0:
-            page.go("/home")
-        elif index == 1:
-            page.go("/desempenho")
-        elif index == 2:
-            page.go("/notificação")
-        elif index == 3:
-            page.go("/perfil")
-
     # Configurando o NavigationBar
     navbar = ft.NavigationBar(
         selected_index=0,
@@ -234,12 +251,11 @@ def HomeView(page: ft.Page):
                 label="Perfil"
             ),
         ],
-        on_change=mudar_tela
     )
 
     # Container de MATERIAL DO CURSO
     eventos = ft.Container(
-        on_click=ir_para_aulas,  # ABRE A TELA DE AULAS
+        on_click=ir_para_aulas,
         ink=True,
         content=ft.Column(
             alignment=ft.alignment.center, 
@@ -378,16 +394,30 @@ def HomeView(page: ft.Page):
         bgcolor=ft.Colors.SURFACE_CONTAINER_HIGHEST
     )
     
-    return ft.View(
-        route="/home",
+    # Container principal scrollável
+    main_content = ft.ListView(
         controls=[
-            appbar,
             perfil,
             carousel,
             eventos,
             links,
-            navbar
         ],
-        vertical_alignment="center",
-        horizontal_alignment="center"
+        spacing=10,
+        padding=20,
+        auto_scroll=True,
+        expand=True,
     )
+
+    # Criar a view com o layout vertical scrollável
+    view = ft.View(
+        route="/home",
+        controls=[
+            appbar,  # AppBar fixo no topo
+            main_content,  # Conteúdo scrollável
+            navbar,  # Navbar fixo embaixo
+        ],
+        spacing=0,
+        padding=0
+    )
+    
+    return view
