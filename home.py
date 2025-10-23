@@ -2,30 +2,191 @@ import flet as ft
 from flet import *
 import time
 import threading
-from gtts import gTTS
 
-import os 
 def HomeView(page: ft.Page):
     
     page.theme_mode = ft.ThemeMode.DARK 
     page.theme = ft.Theme(color_scheme_seed=ft.Colors.DEEP_ORANGE)
     page.title = "PROGRAMADORES"
 
-    page.scroll = 'auto'
+    # VARIÁVEL PARA CONTROLE DO TAMANHO DA FONTE
+    current_font_scale = 1.0
+    font_scales = [0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5]
+    current_font_index = 2  # Índice inicial (1.0)
 
+    # DICIONÁRIO PARA ARMAZENAR OS CONTROLES DE TEXTO
+    text_controls = {}
 
-    # CARROSSEL MELHORADO
+    # CONTROLES DO MODAL QUE PRECISAM SER ATUALIZADOS
+    modal_current_percent_text = ft.Text(f"{int(current_font_scale * 100)}%", size=16, weight="bold")
+    modal_scale_indicator = ft.Text(
+        "Escala: " + " • ".join([
+            f"{'●' if i == current_font_index else '○'} {int(scale * 100)}%" 
+            for i, scale in enumerate(font_scales)
+        ]),
+        size=12,
+        color=ft.Colors.WHITE
+    )
+
+    # FUNÇÃO PARA ATUALIZAR O MODAL
+    def update_modal_display():
+        modal_current_percent_text.value = f"{int(current_font_scale * 100)}%"
+        modal_scale_indicator.value = "Escala: " + " • ".join([
+            f"{'●' if i == current_font_index else '○'} {int(scale * 100)}%" 
+            for i, scale in enumerate(font_scales)
+        ])
+
+    # FUNÇÃO PARA MOSTRAR MODAL DE FONTE
+    def show_font_modal(e):
+        update_modal_display()  # Atualiza antes de abrir
+        font_modal.open = True
+        page.update()
+
+    # FUNÇÃO PARA FECHAR MODAL
+    def close_font_modal(e):
+        font_modal.open = False
+        page.update()
+
+    # FUNÇÃO PARA AUMENTAR FONTE
+    def increase_font(e):
+        nonlocal current_font_index, current_font_scale
+        if current_font_index < len(font_scales) - 1:
+            current_font_index += 1
+            current_font_scale = font_scales[current_font_index]
+            apply_font_size()
+            update_modal_display()  # Atualiza o modal
+            page.update()
+
+    # FUNÇÃO PARA DIMINUIR FONTE
+    def decrease_font(e):
+        nonlocal current_font_index, current_font_scale
+        if current_font_index > 0:
+            current_font_index -= 1
+            current_font_scale = font_scales[current_font_index]
+            apply_font_size()
+            update_modal_display()  # Atualiza o modal
+            page.update()
+
+    # FUNÇÃO PARA RESETAR FONTE
+    def reset_font(e):
+        nonlocal current_font_index, current_font_scale
+        current_font_index = 2
+        current_font_scale = font_scales[current_font_index]
+        apply_font_size()
+        update_modal_display()  # Atualiza o modal
+        page.update()
+
+    # FUNÇÃO PARA APLICAR O TAMANHO DA FONTE EM TODOS OS TEXTOS
+    def apply_font_size():
+        for control_id, control_info in text_controls.items():
+            original_size = control_info["original_size"]
+            control = control_info["control"]
+            
+            if hasattr(control, 'size') and control.size is not None:
+                control.size = int(original_size * current_font_scale)
+            elif hasattr(control, 'title') and hasattr(control.title, 'size'):
+                control.title.size = int(original_size * current_font_scale)
+            elif hasattr(control, 'subtitle') and hasattr(control.subtitle, 'size'):
+                control.subtitle.size = int(original_size * current_font_scale)
+
+    # FUNÇÃO AUXILIAR PARA REGISTRAR CONTROLES DE TEXTO
+    def register_text_control(control, original_size, control_id=None):
+        if control_id is None:
+            control_id = f"control_{len(text_controls)}"
+        text_controls[control_id] = {
+            "control": control,
+            "original_size": original_size
+        }
+        return control
+
+    # MODAL PARA CONTROLE DE FONTE
+    font_modal = ft.AlertDialog(
+        modal=True,
+        title=ft.Text("Tamanho da Fonte"),
+        content=ft.Column(
+            width=300,
+            tight=True,
+            controls=[
+                ft.Row(
+                    alignment="center",
+                    controls=[
+                        ft.Text("Tamanho atual: ", size=16),
+                        modal_current_percent_text,  # Usa o controle que será atualizado
+                    ]
+                ),
+                ft.Divider(),
+                ft.Row(
+                    alignment="spaceEvenly",
+                    controls=[
+                        ft.IconButton(
+                            ft.Icons.REMOVE_CIRCLE_OUTLINED,
+                            icon_color=ft.Colors.RED,
+                            icon_size=30,
+                            tooltip="Diminuir fonte",
+                            on_click=decrease_font
+                        ),
+                        ft.IconButton(
+                            ft.Icons.REFRESH,
+                            icon_color=ft.Colors.BLUE,
+                            icon_size=30,
+                            tooltip="Tamanho padrão",
+                            on_click=reset_font
+                        ),
+                        ft.IconButton(
+                            ft.Icons.ADD_CIRCLE_OUTLINED,
+                            icon_color=ft.Colors.GREEN,
+                            icon_size=30,
+                            tooltip="Aumentar fonte",
+                            on_click=increase_font
+                        ),
+                    ]
+                ),
+                ft.Container(height=10),
+                modal_scale_indicator,  # Usa o controle que será atualizado
+            ]
+        ),
+        actions=[
+            ft.TextButton("Fechar", on_click=close_font_modal),
+        ],
+        actions_alignment="end",
+    )
+
+    # ADICIONAR MODAL À PÁGINA
+    page.overlay.append(font_modal)
+
+    # SCROLL AUTOMÁTICO CONFIGURADO (SEM THREAD PROBLEMÁTICA)
+    page.scroll = ft.ScrollMode.AUTO
+
+    # Função de scroll automático segura
+    def start_auto_scroll():
+        # Espera a página estar completamente carregada
+        def safe_auto_scroll():
+            time.sleep(3)  # Aguarda 3 segundos para garantir que a página esteja carregada
+            if page and hasattr(page, 'scroll_to'):
+                try:
+                    # Scroll suave para baixo
+                    page.scroll_to(offset=0, duration=500)
+                    time.sleep(1)
+                    for i in range(1, 50):  # Reduzido para ser mais rápido
+                        time.sleep(0.03)
+                        page.scroll_to(offset=i * 20, duration=200, curve=ft.AnimationCurve.EASE_OUT)
+                except Exception as e:
+                    print(f"Scroll automático não pôde ser executado: {e}")
+        
+        # Inicia em uma thread separada
+        threading.Thread(target=safe_auto_scroll, daemon=True).start()
+
+    # CARROSSEL
     carousel_images = [
-        r"Fabrica_app\src\img\fabrica-programadores-parnaiba.png", 
-        r"Fabrica_app\src\img\sala.jpg", 
-        r"Fabrica_app\src\img\gaby.jpg",
-        r"Fabrica_app\src\img\fabrica.jpg"
+        r"fabrica-programadores-parnaiba.png", 
+        r"sala.jpg", 
+        r"gaby.jpg",
+        r"fabrica.jpg"
     ]
     carousel_index = 0
 
-    # Container do carrossel
     carousel_image = ft.Image(
-        src=carousel_images[0],
+        src=f"img/{carousel_images[0]}",
         width=450,
         height=200,
         fit=ft.ImageFit.COVER,
@@ -33,8 +194,7 @@ def HomeView(page: ft.Page):
     )
 
     def update_carousel():
-        carousel_image.src = carousel_images[carousel_index]
-        # Atualizar dots
+        carousel_image.src = f"img/{carousel_images[carousel_index]}"
         for i, dot in enumerate(dots.controls):
             dot.bgcolor = ft.Colors.DEEP_ORANGE if i == carousel_index else ft.Colors.WHITE24
         page.update()
@@ -49,31 +209,24 @@ def HomeView(page: ft.Page):
         carousel_index = (carousel_index - 1) % len(carousel_images)
         update_carousel()
 
-    # Auto-play do carrossel
     def auto_play():
         while True:
-            time.sleep(4)
+            time.sleep(3)
             next_slide()
 
-    # Iniciar thread do auto-play
     threading.Thread(target=auto_play, daemon=True).start()
 
-    # Indicadores (dots) mais modernos
     dots = ft.Row(
         controls=[
-            ft.Container(
-                width=8,
-                height=8,
-                border_radius=4,
-                bgcolor=ft.Colors.WHITE24,
-            ) for _ in carousel_images
+            ft.Container(width=10, height=10, border_radius=20,
+                         bgcolor=ft.Colors.DEEP_ORANGE if i == 0 else ft.Colors.WHITE24)
+            for i in range(len(carousel_images))
         ],
-        alignment="center",
-        spacing=8,
+        alignment=ft.MainAxisAlignment.CENTER,
+        spacing=5
     )
     dots.controls[0].bgcolor = ft.Colors.DEEP_ORANGE
 
-    # Layout do carrossel
     carousel = ft.Container(
         content=ft.Stack(
             controls=[
@@ -102,19 +255,15 @@ def HomeView(page: ft.Page):
         )
     )
 
-    # ===================================== CRIANDO FUNÇÕES DOS ELEMENTOS
-    
-    # FUNÇÃO PARA IR PARA O PERFIL
+    # ===================================== FUNÇÕES PRINCIPAIS
     def ir_para_perfil(e):
         page.go("/perfil")
 
-    # FUNÇÃO PARA IR PARA AS AULAS
     def ir_para_aulas(e):
         page.go("/aulasView")
 
-    # FUNÇÃO PARA IR PARA O SUPORTE - CORRIGIDA
     def ir_para_suporte(e):
-        page.go("/suporte")  # CORRIGIDO: de "/suporte_view" para "/suporte"
+        page.go("/suporte")
 
     def mudar_tema(e):
         if page.theme_mode == ft.ThemeMode.DARK:
@@ -126,61 +275,109 @@ def HomeView(page: ft.Page):
         print(f"Tema alterado para: {page.theme_mode}")
         page.update()
 
-    # ===================================== CRIANDO ELEMENTOS
+    # ===================================== ELEMENTOS DA INTERFACE
+    # TÍTULO DO APP BAR
+    appbar_title = register_text_control(
+        ft.Text("FÁBRICA DE PROGRAMADORES", weight="bold"),
+        16,
+        "appbar_title"
+    )
+
+    # BOTÃO ÚNICO PARA CONTROLE DE FONTE
+    font_control_btn = ft.IconButton(
+        ft.Icons.FONT_DOWNLOAD_ROUNDED,
+        on_click=show_font_modal,
+        tooltip="Ajustar tamanho da fonte"
+    )
+
     appbar = ft.AppBar(
         leading_width=10,
-        title=ft.Text("FÁBRICA DE PROGRAMADORES", weight="bold"),
+        title=appbar_title,
         center_title=True,
         bgcolor=ft.Colors.SURFACE_CONTAINER_HIGHEST,  
         actions=[ 
-                ft.IconButton(ft.Icons.HEARING,),
+            ft.IconButton(ft.Icons.HEARING, tooltip="Acessibilidade"),
+            font_control_btn,  # APENAS UM BOTÃO AGORA
             ft.PopupMenuButton(
                 items=[
-                    ft.PopupMenuItem(text="TEMA", icon="WB_SUNNY_OUTLINED", on_click=mudar_tema),
-                    ft.PopupMenuItem(text="ACESSIBILIDADE", icon="SUN", on_click=mudar_tema), # icon hearing
-                    ft.PopupMenuItem(text="CONFIGURAÇÕES", icon="SETTINGS_OUTLINED", on_click=...),
-                    ft.PopupMenuItem(text="SUPORTE", icon="HELP_OUTLINE_ROUNDED", on_click=ir_para_suporte),  # AGORA FUNCIONA
+                    ft.PopupMenuItem(
+                        text="TEMA",
+                        icon="WB_SUNNY_OUTLINED", 
+                        on_click=mudar_tema
+                    ),
+                    ft.PopupMenuItem(
+                        text="ACESSIBILIDADE",
+                        icon="SUN", 
+                        on_click=lambda e: print("Acessibilidade")
+                    ),
+                    ft.PopupMenuItem(
+                        text="CONFIGURAÇÕES",
+                        icon="SETTINGS_OUTLINED", 
+                        on_click=lambda e: print("Configurações")
+                    ),
+                    ft.PopupMenuItem(
+                        text="SUPORTE",
+                        icon="HELP_OUTLINE_ROUNDED", 
+                        on_click=ir_para_suporte
+                    ),
                     ft.PopupMenuItem(),
-                    ft.PopupMenuItem(text="SAIR", icon="CLOSE_ROUNDED", on_click=...),        
+                    ft.PopupMenuItem(
+                        text="SAIR",
+                        icon="CLOSE_ROUNDED", 
+                        on_click=lambda e: print("Sair")
+                    ),        
                 ]
             ),
         ],
     )
     
     # PERFIL
+    user_name = register_text_control(
+        ft.Text("Usuário", size=20, weight="bold"),
+        20,
+        "user_name"
+    )
+    
+    user_role = register_text_control(
+        ft.Text("Programador Iniciante", size=14, color=ft.Colors.GREY_400),
+        14,
+        "user_role"
+    )
+
+    # Criando o botão com text e icon corretamente
+    edit_profile_button = ft.ElevatedButton(
+        text="Editar Perfil",  # Texto diretamente no botão
+        icon=ft.Icons.EDIT_ROUNDED,
+        style=ft.ButtonStyle(
+            padding=ft.padding.symmetric(horizontal=20, vertical=10),
+            shape=ft.RoundedRectangleBorder(radius=10)
+        ),
+        on_click=ir_para_perfil
+    )
+
     perfil = ft.Container(
         content=ft.Row(
             spacing=20,
             controls=[
-                # Container da foto de perfil
                 ft.Container(
                     content=ft.Image(
-                        src=r"Fabrica_app\src\img\perfil.png",
+                        src=r"img\perfil.png",
                         width=110,
                         height=110,
                         fit=ft.ImageFit.COVER,
                     ),
                     width=110,
                     height=110,
-                    border_radius=55,  # Torna circular
-                    clip_behavior=ft.ClipBehavior.HARD_EDGE,  # Importante para border_radius funcionar
+                    border_radius=55,
+                    clip_behavior=ft.ClipBehavior.HARD_EDGE,
                 ),
-                # Coluna com informações do usuário
                 ft.Column(
                     spacing=8,
                     alignment=ft.MainAxisAlignment.CENTER,
                     controls=[
-                        ft.Text("Usuário", size=20, weight="bold"),
-                        ft.Text("Programador Iniciante", size=14, color=ft.Colors.GREY_400),
-                        ft.ElevatedButton(
-                            "Editar Perfil",
-                            icon=ft.Icons.EDIT_ROUNDED,
-                            style=ft.ButtonStyle(
-                                padding=ft.padding.symmetric(horizontal=20, vertical=10),
-                                shape=ft.RoundedRectangleBorder(radius=10)
-                            ),
-                            on_click=ir_para_perfil
-                        )
+                        user_name,
+                        user_role,
+                        edit_profile_button
                     ]
                 )
             ]
@@ -197,7 +394,7 @@ def HomeView(page: ft.Page):
         )
     )
 
-    # Função para mudar de tela conforme índice do NavigationBar
+    # NAVIGATION BAR
     def mudar_tela(e):
         index = e.control.selected_index
         if index == 0:
@@ -209,7 +406,6 @@ def HomeView(page: ft.Page):
         elif index == 3:
             page.go("/perfil")
 
-    # Configurando o NavigationBar
     navbar = ft.NavigationBar(
         selected_index=0,
         destinations=[
@@ -237,30 +433,66 @@ def HomeView(page: ft.Page):
         on_change=mudar_tela
     )
 
-    # Container de MATERIAL DO CURSO
+    # MATERIAL DO CURSO
+    material_title = register_text_control(
+        ft.Text("MATERIAL DO CURSO", size=18, weight="bold"),
+        18,
+        "material_title"
+    )
+
+    python_title = register_text_control(
+        ft.Text("AULAS DE PYTHON", weight="bold"),
+        16,
+        "python_title"
+    )
+
+    python_subtitle = register_text_control(
+        ft.Text("70% DE APROVEITAMENTO DAS AULAS"),
+        14,
+        "python_subtitle"
+    )
+
+    api_title = register_text_control(
+        ft.Text("AULAS DE API", weight="bold"),
+        16,
+        "api_title"
+    )
+
+    api_subtitle = register_text_control(
+        ft.Text("30% DE APROVEITAMENTO DAS AULAS"),
+        14,
+        "api_subtitle"
+    )
+
+    notification_text = register_text_control(
+        ft.Text("2", color=ft.Colors.WHITE, size=12, weight="bold"),
+        12,
+        "notification_badge"
+    )
+
     eventos = ft.Container(
-        on_click=ir_para_aulas,  # ABRE A TELA DE AULAS
+        on_click=ir_para_aulas,
         ink=True,
         content=ft.Column(
             alignment=ft.alignment.center, 
             spacing=15,
             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
             controls=[
-                ft.Text("MATERIAL DO CURSO", size=18, weight="bold"),
+                material_title,
                 ft.Container(
                     content=ft.Column([
                         ft.ListTile(
-                            leading=ft.Image(src=r"Fabrica_app\src\img\python.jpg"),
-                            title=ft.Text("AULAS DE PYTHON", weight="bold"),
-                            subtitle=ft.Text("70% DE APROVEITAMENTO DAS AULAS"),
+                            leading=ft.Image(src=r"img\python.jpg"),
+                            title=python_title,
+                            subtitle=python_subtitle,
                             trailing=ft.Icon(ft.Icons.CHECK_CIRCLE_ROUNDED, color=ft.Colors.GREEN)
                         ),
                         ft.ListTile(
-                            leading=ft.Image(src=r"Fabrica_app\src\img\api.jpg"),
-                            title=ft.Text("AULAS DE API", weight="bold"),
-                            subtitle=ft.Text("30% DE APROVEITAMENTO DAS AULAS"),
+                            leading=ft.Image(src=r"img\api.jpg"),
+                            title=api_title,
+                            subtitle=api_subtitle,
                             trailing=ft.Container(
-                                content=ft.Text("2", color=ft.Colors.WHITE, size=12, weight="bold"),
+                                content=notification_text,
                                 bgcolor=ft.Colors.RED,
                                 width=24,
                                 height=24,
@@ -285,25 +517,47 @@ def HomeView(page: ft.Page):
         animate=ft.Animation(200, "easeInOut"),
     )
 
-    # Função para tratar hover
     def on_hover_eventos(e):
         eventos.bgcolor = ft.Colors.SURFACE_CONTAINER_HIGHEST if e.data == "true" else ft.Colors.SURFACE_CONTAINER_HIGHEST
         page.update()
 
     eventos.on_hover = on_hover_eventos
 
-    # Função para abrir links externos
+    # LINKS
     def abrir_link(e, url):
         page.launch_url(url)
 
-    # Links melhorados
+    sites_title = register_text_control(
+        ft.Text("SITES IMPORTANTES", size=18, weight="bold"),
+        18,
+        "sites_title"
+    )
+
+    fabrica_text = register_text_control(
+        ft.Text("FÁBRICA", size=14, weight="bold"),
+        14,
+        "fabrica_text"
+    )
+
+    devs_text = register_text_control(
+        ft.Text("DEVS", size=14, weight="bold"),
+        14,
+        "devs_text"
+    )
+
+    senai_text = register_text_control(
+        ft.Text("SENAI", size=14, weight="bold"),
+        14,
+        "senai_text"
+    )
+
     links = ft.Container(
         content=ft.Column(
             spacing=20,
             alignment=ft.alignment.center,
             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
             controls=[
-                ft.Text("SITES IMPORTANTES", size=18, weight="bold", ),
+                sites_title,
                 ft.Row( 
                     alignment="spaceEvenly",
                     spacing=10,
@@ -314,7 +568,7 @@ def HomeView(page: ft.Page):
                             controls=[
                                 ft.Container(
                                     content=ft.Image(
-                                        src=r"Fabrica_app\src\img\santana.png",  
+                                        src=r"img\santana.png",  
                                         width=70,
                                         height=70,
                                         fit=ft.ImageFit.COVER
@@ -325,7 +579,7 @@ def HomeView(page: ft.Page):
                                     on_click=lambda e: abrir_link(e, "https://prefeitura.santanadeparnaiba.sp.gov.br/Plataforma/smti/fabrica-de-programadores"),
                                     ink=True,
                                 ),
-                                ft.Text("FÁBRICA", size=14, weight="bold")
+                                fabrica_text
                             ]
                         ),
                         ft.Column(
@@ -334,7 +588,7 @@ def HomeView(page: ft.Page):
                             controls=[
                                 ft.Container(
                                     content=ft.Image(
-                                        src=r"Fabrica_app\src\img\portifolio.jpg",
+                                        src=r"img\portifolio.jpg",
                                         width=70,
                                         height=70,
                                         fit=ft.ImageFit.COVER
@@ -345,7 +599,7 @@ def HomeView(page: ft.Page):
                                     on_click=lambda e: abrir_link(e, "https://github.com"),
                                     ink=True,
                                 ),
-                                ft.Text("DEVS", size=14, weight="bold")
+                                devs_text
                             ]
                         ),
                         ft.Column(
@@ -354,7 +608,7 @@ def HomeView(page: ft.Page):
                             controls=[
                                 ft.Container(
                                     content=ft.Image(
-                                        src=r"Fabrica_app\src\img\senai.jpg",
+                                        src=r"img\senai.jpg",
                                         width=70,
                                         height=70,
                                         fit=ft.ImageFit.COVER
@@ -365,7 +619,7 @@ def HomeView(page: ft.Page):
                                     on_click=lambda e: abrir_link(e, "https://www.sp.senai.br/"),
                                     ink=True,
                                 ), 
-                                ft.Text("SENAI", size=14, weight="bold")
+                                senai_text
                             ]
                         ),
                     ]
@@ -377,28 +631,39 @@ def HomeView(page: ft.Page):
         border_radius=15,
         bgcolor=ft.Colors.SURFACE_CONTAINER_HIGHEST
     )
-    
-    # MAIN CONTENT COM LISTVIEW (ADICIONADO)
-    main_content = ft.ListView(
+
+    # LISTVIEW PARA SCROLL VERTICAL
+    content_listview = ft.ListView(
+        expand=True,
+        spacing=10,
+        padding=20,
         controls=[
             perfil,
             carousel,
             eventos,
             links,
-        ],
-        spacing=10,
-        padding=20,
-        auto_scroll=True,
-        expand=True,
+        ]
     )
-    
-    return ft.View(
+
+    # APLICA O TAMANHO INICIAL DA FONTE
+    apply_font_size()
+
+    # View final
+    view = ft.View(
         route="/home",
         controls=[
             appbar,
-            main_content,  # SUBSTITUÍDO OS CONTROLES INDIVIDUAIS PELA LISTVIEW
+            content_listview,
             navbar
         ],
-        vertical_alignment="center",
-        horizontal_alignment="center"
+        scroll=ft.ScrollMode.AUTO,
     )
+
+    # Inicia o scroll automático após a view estar pronta
+    def on_view_loaded(e):
+        start_auto_scroll()
+    
+    # Adiciona um evento para quando a view for carregada
+    view.on_load = on_view_loaded
+
+    return view
