@@ -1,8 +1,8 @@
 from flet import *
 import flet as ft
-import matplotlib.pyplot as plt
-import io
-import base64
+# import matplotlib.pyplot as plt
+# import io
+# import base64
 
 def DesempenhoView(page: ft.Page):
    
@@ -36,42 +36,198 @@ def DesempenhoView(page: ft.Page):
             page.theme = ft.Theme(color_scheme_seed=ft.Colors.DEEP_ORANGE)
         print(f"Tema alterado para: {page.theme_mode}")
         
-        # Atualizar o gráfico quando o tema mudar
-        grafico.content = gerar_grafico(tipo_grafico_atual)
+        # # Atualizar o gráfico quando o tema mudar
+        # grafico.content = gerar_grafico(tipo_grafico_atual)
+        # page.update()
+
+        # Dados dos módulos
+    modulos = ["Modulo 1", "Modulo 2", "Modulo 3"]
+    notas = [80, 90, 70]
+    frequencias = [92, 87, 95]
+
+    # Container do gráfico
+    grafico_container = ft.Container(
+        width=450,
+        height=300,
+        alignment=ft.alignment.center,
+    )
+
+    # Variável para controlar o segmento selecionado
+    selected_index = ft.Ref[ft.CupertinoSlidingSegmentedButton]()
+
+    def criar_grafico_barras(tipo="geral"):
+        if tipo == "geral":
+            # Gráfico com barras agrupadas (notas e frequência)
+            grupos_barras = [
+                ft.BarChartGroup(
+                    x=i,
+                    bar_rods=[
+                        ft.BarChartRod(
+                            from_y=0,
+                            to_y=notas[i],
+                            width=20,
+                            color=ft.Colors.DEEP_ORANGE,
+                            border_radius=0,
+                            tooltip=f"Nota: {notas[i]}%",
+                        ),
+                        ft.BarChartRod(
+                            from_y=0,
+                            to_y=frequencias[i],
+                            width=20,
+                            color=ft.Colors.BLUE,
+                            border_radius=0,
+                            tooltip=f"Frequência: {frequencias[i]}%",
+                        ),
+                    ],
+                )
+                for i in range(3)
+            ]
+            
+        elif tipo == "notas":
+            # Gráfico apenas de notas
+            grupos_barras = [
+                ft.BarChartGroup(
+                    x=i,
+                    bar_rods=[
+                        ft.BarChartRod(
+                            from_y=0,
+                            to_y=notas[i],
+                            width=20,
+                            color=ft.Colors.DEEP_ORANGE,
+                            border_radius=0,
+                            tooltip=f"Nota: {notas[i]}%",
+                        ),
+                        ft.BarChartRod(
+                            from_y=0,
+                            to_y=notas[i],
+                            width=20,
+                            color=ft.Colors.DEEP_ORANGE,
+                            border_radius=0,
+                            tooltip=f"Nota: {notas[i]}%",
+                        ),
+                    ],
+                )
+                for i in range(3)
+            ]
+            
+        elif tipo == "frequencia":
+            # Gráfico apenas de frequência
+            grupos_barras = [
+                ft.BarChartGroup(
+                    x=i,
+                    bar_rods=[
+                        ft.BarChartRod(
+                            from_y=0,
+                            to_y=frequencias[i],
+                            width=20,
+                            color=ft.Colors.BLUE,
+                            border_radius=0,
+                            tooltip=f"Frequência: {frequencias[i]}%",
+                        ),
+                        ft.BarChartRod(
+                            from_y=0,
+                            to_y=frequencias[i],
+                            width=20,
+                            color=ft.Colors.BLUE,
+                            border_radius=0,
+                            tooltip=f"Frequência: {frequencias[i]}%",
+                        ),
+                    ],
+                )
+                for i in range(3)
+            ]
+        
+        # Criar labels de 10 em 10 de forma explícita
+        labels_eixo_y = [
+            ft.ChartAxisLabel(value=0, label=ft.Text("0%", size=10)),
+            ft.ChartAxisLabel(value=10, label=ft.Text("10%", size=10)),
+            ft.ChartAxisLabel(value=20, label=ft.Text("20%", size=10)),
+            ft.ChartAxisLabel(value=30, label=ft.Text("30%", size=10)),
+            ft.ChartAxisLabel(value=40, label=ft.Text("40%", size=10)),
+            ft.ChartAxisLabel(value=50, label=ft.Text("50%", size=10)),
+            ft.ChartAxisLabel(value=60, label=ft.Text("60%", size=10)),
+            ft.ChartAxisLabel(value=70, label=ft.Text("70%", size=10)),
+            ft.ChartAxisLabel(value=80, label=ft.Text("80%", size=10)),
+            ft.ChartAxisLabel(value=90, label=ft.Text("90%", size=10)),
+            ft.ChartAxisLabel(value=100, label=ft.Text("100%", size=10)),
+        ]
+        
+        # Gráfico com eixo Y à esquerda
+        chart = ft.BarChart(
+            bar_groups=grupos_barras,
+            border=ft.border.all(1, ft.Colors.GREY_700),
+            left_axis=ft.ChartAxis(
+                labels=labels_eixo_y,
+                labels_size=40,
+            ),
+            bottom_axis=ft.ChartAxis(
+                labels=[
+                    ft.ChartAxisLabel(value=0, label=ft.Text(modulos[0], size=12)),
+                    ft.ChartAxisLabel(value=1, label=ft.Text(modulos[1], size=12)),
+                    ft.ChartAxisLabel(value=2, label=ft.Text(modulos[2], size=12)),
+                ],
+                labels_size=80,
+            ),
+            horizontal_grid_lines=ft.ChartGridLines(
+                color=ft.Colors.GREY_700, 
+                width=1, 
+                dash_pattern=[3, 3]
+            ),
+            tooltip_bgcolor=ft.Colors.with_opacity(0.8, ft.Colors.BLACK),
+            max_y=100,
+            interactive=True,
+            expand=True,
+        )
+        
+        return chart
+
+    # Inicializar com gráfico geral
+    grafico_container.content = criar_grafico_barras("geral")
+
+    # Função para atualizar o gráfico
+    def atualizar_grafico(e):
+        tipos = ["geral", "notas", "frequencia"]
+        tipo_selecionado = tipos[e.control.selected_index]
+        grafico_container.content = criar_grafico_barras(tipo_selecionado)
         page.update()
 
-    # ===================================== CRIANDO ELEMENTOS
-    appbar = ft.AppBar(
-        leading_width=10,
-        title=ft.Text("DESEMPENHO", weight="bold"),
-        bgcolor=ft.Colors.SURFACE_CONTAINER_HIGHEST,  
-        actions=[
-            ft.PopupMenuButton(
-                items=[
-                    ft.PopupMenuItem(text="TEMA", icon="WB_SUNNY_OUTLINED", on_click=mudar_tema),
-                    ft.PopupMenuItem(text="CONFIGURAÇÕES", icon="SETTINGS_OUTLINED", on_click=clicou_menu),
-                    ft.PopupMenuItem(text="SUPORTE", icon="HELP_OUTLINE_ROUNDED", on_click=clicou_menu),
-                    ft.PopupMenuItem(),
-                    ft.PopupMenuItem(text="SAIR", icon="CLOSE_ROUNDED", on_click=clicou_menu),        
-                ]
-            ),
+    # Botão de controle com CupertinoSlidingSegmentedButton
+    segmented_button = ft.CupertinoSlidingSegmentedButton(
+        selected_index=0,
+        on_change=atualizar_grafico,
+        controls=[
+            ft.Text("Geral"),
+            ft.Text("Aproveitamento"),
+            ft.Text("Frequência"),
         ],
     )
+
+    # ===================================== CRIANDO ELEMENTOS
+    from home import HomeView
+    def voltar_home(a):
+        page.views.append(HomeView(page))
+
+    appbar = ft.AppBar(
+    leading=ft.IconButton(
+        ft.Icons.ARROW_BACK,
+        on_click=voltar_home,
+    ), 
+    title=ft.Text("DESEMPENHO", weight="bold"),  # título da AppBar
+    bgcolor=ft.Colors.SURFACE_CONTAINER_HIGHEST,  # cor de fundo
+    actions=[  # ações do lado direito
+        ft.PopupMenuButton(
+            items=[
+                ft.PopupMenuItem(text="TEMA", icon="WB_SUNNY_OUTLINED", on_click=mudar_tema),
+                ft.PopupMenuItem(text="CONFIGURAÇÕES", icon="SETTINGS_OUTLINED", on_click=clicou_menu),
+                ft.PopupMenuItem(text="SUPORTE", icon="HELP_OUTLINE_ROUNDED", on_click=clicou_menu),
+                ft.PopupMenuItem(),  # separador
+                ft.PopupMenuItem(text="SAIR", icon="CLOSE_ROUNDED", on_click=clicou_menu),
+            ]
+        ),
+    ],
+    )
      
-    # Função para mudar de tela conforme índice do NavigationBar
-    def mudar_tela(e):
-        num = e.control.selected_index
-        if num == 0:
-            print("Indo para Início...")
-        elif num == 1:
-            print("Indo para Desempenho...")
-        elif num == 2:
-            print("Indo para Notificações...")
-        elif num == 3:
-            print("Indo para Perfil...")
-        page.update()
-
-
+    # Função para mudar de tela conforme índice do NavigationBar    
     def mudar_tela(e):
         index = e.control.selected_index
         if index == 0:
@@ -111,7 +267,16 @@ def DesempenhoView(page: ft.Page):
         on_change=mudar_tela
     )
 
-    
+    # Conteúdo principal da tela de Desempenho
+    content = ft.Column(
+        controls=[
+            ft.Text("Tela de Desempenho", size=24, weight="bold"),
+            ft.Text("Aqui você pode ver suas estatísticas e progresso."),
+        ],
+        alignment="center",
+        horizontal_alignment="center",
+        expand=True
+    )
 
     card_colegio = ft.ResponsiveRow([
         ft.Container(
@@ -185,148 +350,176 @@ def DesempenhoView(page: ft.Page):
         expand=True,  # deixa o row expandir na tela
     )
 
-    # Variável para controlar o tipo de gráfico atual
-    tipo_grafico_atual = "geral"
+    # # Variável para controlar o tipo de gráfico atual
+    # tipo_grafico_atual = "geral"
 
-    # Gera o gráfico e o converte em imagem
-    def gerar_grafico(tipo="geral"):
-        global tipo_grafico_atual
-        tipo_grafico_atual = tipo
+    # # Gera o gráfico e o converte em imagem
+    # def gerar_grafico(tipo="geral"):
+    #     global tipo_grafico_atual
+    #     tipo_grafico_atual = tipo
         
-        # Define cores baseadas no tema
-        if page.theme_mode == ft.ThemeMode.DARK:
-            # Tema escuro: texto branco, fundo transparente
-            cor_texto = "white"
-            cor_fundo = "none"
-            cor_grade = "#444444"
-        else:
-            # Tema claro: texto preto, fundo transparente
-            cor_texto = "black"
-            cor_fundo = "none"
-            cor_grade = "#dddddd"
+    #     # Define cores baseadas no tema
+    #     if page.theme_mode == ft.ThemeMode.DARK:
+    #         # Tema escuro: texto branco, fundo transparente
+    #         cor_texto = "white"
+    #         cor_fundo = "none"
+    #         cor_grade = "#444444"
+    #     else:
+    #         # Tema claro: texto preto, fundo transparente
+    #         cor_texto = "black"
+    #         cor_fundo = "none"
+    #         cor_grade = "#dddddd"
         
-        # Configurar estilo do matplotlib baseado no tema
-        plt.rcParams.update({
-            'text.color': cor_texto,
-            'axes.labelcolor': cor_texto,
-            'axes.edgecolor': cor_texto,
-            'axes.facecolor': cor_fundo,
-            'figure.facecolor': cor_fundo,
-            'xtick.color': cor_texto,
-            'ytick.color': cor_texto,
-            'grid.color': cor_grade
-        })
+    #     # Configurar estilo do matplotlib baseado no tema
+    #     plt.rcParams.update({
+    #         'text.color': cor_texto,
+    #         'axes.labelcolor': cor_texto,
+    #         'axes.edgecolor': cor_texto,
+    #         'axes.facecolor': cor_fundo,
+    #         'figure.facecolor': cor_fundo,
+    #         'xtick.color': cor_texto,
+    #         'ytick.color': cor_texto,
+    #         'grid.color': cor_grade
+    #     })
         
-        fig, ax = plt.subplots(figsize=(5, 3))
+    #     fig, ax = plt.subplots(figsize=(5, 3))
         
-        # Definir cores das barras baseadas no tema
-        if page.theme_mode == ft.ThemeMode.DARK:
-            cor_notas = "#FF7B00"  # Laranja
-            cor_frequencia = "#1465A7"  # Azul
-        else:
-            cor_notas = "#FF7B00"  # Laranja (mantém as cores originais no tema claro)
-            cor_frequencia = "#1465A7"  # Azul
+    #     # Definir cores das barras baseadas no tema
+    #     if page.theme_mode == ft.ThemeMode.DARK:
+    #         cor_notas = "#FF7B00"  # Laranja
+    #         cor_frequencia = "#1465A7"  # Azul
+    #     else:
+    #         cor_notas = "#FF7B00"  # Laranja (mantém as cores originais no tema claro)
+    #         cor_frequencia = "#1465A7"  # Azul
         
-        materias = ["Módulo 1", "Módulo 2", "Módulo 3"]
-        notas = [80, 90, 70]
-        frequencias = [92, 87, 95]
+    #     materias = ["Módulo 1", "Módulo 2", "Módulo 3"]
+    #     notas = [80, 90, 70]
+    #     frequencias = [92, 87, 95]
 
-        if tipo == "geral":
-            largura = 0.35
-            x = range(len(materias))
-            barras_notas = ax.bar([i - largura/2 for i in x], notas, width=largura, label="Notas", color=cor_notas)
-            barras_freq = ax.bar([i + largura/2 for i in x], frequencias, width=largura, label="Frequência", color=cor_frequencia)
-            ax.set_xticks(x)
-            ax.set_xticklabels(["Modulo 1", "Modulo 2", "Modulo 3"])
-            ax.legend()
+    #     if tipo == "geral":
+    #         largura = 0.35
+    #         x = range(len(materias))
+    #         barras_notas = ax.bar([i - largura/2 for i in x], notas, width=largura, label="Notas", color=cor_notas)
+    #         barras_freq = ax.bar([i + largura/2 for i in x], frequencias, width=largura, label="Frequência", color=cor_frequencia)
+    #         ax.set_xticks(x)
+    #         ax.set_xticklabels(["Modulo 1", "Modulo 2", "Modulo 3"])
+    #         ax.legend()
 
-            # Adiciona valores em % no topo das barras de notas
-            for barra in barras_notas:
-                altura = barra.get_height()
-                ax.text(barra.get_x() + barra.get_width()/2, altura + 1, f'{altura}%', 
-                       ha='center', va='bottom', fontsize=8, color=cor_texto)
+    #         # Adiciona valores em % no topo das barras de notas
+    #         for barra in barras_notas:
+    #             altura = barra.get_height()
+    #             ax.text(barra.get_x() + barra.get_width()/2, altura + 1, f'{altura}%', 
+    #                    ha='center', va='bottom', fontsize=8, color=cor_texto)
 
-            # Adiciona valores em % no topo das barras de frequência
-            for barra in barras_freq:
-                altura = barra.get_height()
-                ax.text(barra.get_x() + barra.get_width()/2, altura + 1, f'{altura}%', 
-                       ha='center', va='bottom', fontsize=8, color=cor_texto)
+    #         # Adiciona valores em % no topo das barras de frequência
+    #         for barra in barras_freq:
+    #             altura = barra.get_height()
+    #             ax.text(barra.get_x() + barra.get_width()/2, altura + 1, f'{altura}%', 
+    #                    ha='center', va='bottom', fontsize=8, color=cor_texto)
 
-        elif tipo == "notas":
-            barras_notas = ax.bar(materias, notas, color=cor_notas)
-            ax.set_xticklabels(["Modulo 1", "Modulo 2", "Modulo 3"])
-            ax.set_title("Notas", color=cor_texto)
+    #     elif tipo == "notas":
+    #         barras_notas = ax.bar(materias, notas, color=cor_notas)
+    #         ax.set_xticklabels(["Modulo 1", "Modulo 2", "Modulo 3"])
+    #         ax.set_title("Notas", color=cor_texto)
 
-            for barra in barras_notas:
-                altura = barra.get_height()
-                ax.text(barra.get_x() + barra.get_width()/2, altura + 1, f'{altura}%', 
-                       ha='center', va='bottom', fontsize=8, color=cor_texto)
+    #         for barra in barras_notas:
+    #             altura = barra.get_height()
+    #             ax.text(barra.get_x() + barra.get_width()/2, altura + 1, f'{altura}%', 
+    #                    ha='center', va='bottom', fontsize=8, color=cor_texto)
 
-        elif tipo == "frequencia":
-            barras_freq = ax.bar(materias, frequencias, color=cor_frequencia)
-            ax.set_xticklabels(["Modulo 1", "Modulo 2", "Modulo 3"])
-            ax.set_title("Frequência", color=cor_texto)
+    #     elif tipo == "frequencia":
+    #         barras_freq = ax.bar(materias, frequencias, color=cor_frequencia)
+    #         ax.set_xticklabels(["Modulo 1", "Modulo 2", "Modulo 3"])
+    #         ax.set_title("Frequência", color=cor_texto)
 
-            for barra in barras_freq:
-                altura = barra.get_height()
-                ax.text(barra.get_x() + barra.get_width()/2, altura + 1, f'{altura}%', 
-                       ha='center', va='bottom', fontsize=8, color=cor_texto)
+    #         for barra in barras_freq:
+    #             altura = barra.get_height()
+    #             ax.text(barra.get_x() + barra.get_width()/2, altura + 1, f'{altura}%', 
+    #                    ha='center', va='bottom', fontsize=8, color=cor_texto)
 
-        ax.set_ylim(0, 110)  # dá um espaço extra para o texto no topo
-        ax.grid(True, alpha=0.3)
-        plt.tight_layout()
+    #     ax.set_ylim(0, 110)  # dá um espaço extra para o texto no topo
+    #     ax.grid(True, alpha=0.3)
+    #     plt.tight_layout()
 
-        # Converte o gráfico em imagem
-        buf = io.BytesIO()
-        plt.savefig(buf, format="png", transparent=True, bbox_inches='tight', 
-                   facecolor=cor_fundo, edgecolor='none')
-        plt.close(fig)
-        buf.seek(0)
-        # Usa o módulo base64 correto para converter
-        img_base64 = base64.b64encode(buf.read()).decode()
-        return ft.Image(src_base64=img_base64)
+    #     # Converte o gráfico em imagem
+    #     buf = io.BytesIO()
+    #     plt.savefig(buf, format="png", transparent=True, bbox_inches='tight', 
+    #                facecolor=cor_fundo, edgecolor='none')
+    #     plt.close(fig)
+    #     buf.seek(0)
+    #     # Usa o módulo base64 correto para converter
+    #     img_base64 = base64.b64encode(buf.read()).decode()
+    #     return ft.Image(src_base64=img_base64)
 
-    grafico = ft.Container(content=gerar_grafico("geral"), alignment=ft.alignment.center)
+    # grafico = ft.Container(content=gerar_grafico("geral"), alignment=ft.alignment.center)
 
-    def atualizar(tipo):
-        grafico.content = gerar_grafico(tipo)
-        page.update()
+    # def atualizar(tipo):
+    #     grafico.content = gerar_grafico(tipo)
+    #     page.update()
 
-    botoes = ft.Row(
-        [
-            ft.ElevatedButton("Geral", on_click=lambda e: atualizar("geral")),
-            ft.ElevatedButton("Aproveitamento", on_click=lambda e: atualizar("notas")),
-            ft.ElevatedButton("Frequência", on_click=lambda e: atualizar("frequencia")),
-        ],
-        alignment=ft.MainAxisAlignment.CENTER,
-        spacing=15
-    )
+    # botoes = ft.Row(
+    #     [
+    #         ft.ElevatedButton("Geral", on_click=lambda e: atualizar("geral")),
+    #         ft.ElevatedButton("Aproveitamento", on_click=lambda e: atualizar("notas")),
+    #         ft.ElevatedButton("Frequência", on_click=lambda e: atualizar("frequencia")),
+    #     ],
+    #     alignment=ft.MainAxisAlignment.CENTER,
+    #     spacing=15
+    # )
+
+
+
+    # topo = ft.Column(
+    #     [
+    #         ft.Container(height=10),
+    #         grafico_container,
+    #     ],
+    #     spacing=0,
+    #     alignment=ft.MainAxisAlignment.CENTER,
+    #     horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+    # )
+
+    
+
 
     topo = ft.Column(
             [
                 card_colegio,
                 ft.Container(height=10),
                 card_situacao,
-                grafico,
+                grafico_container,
+                # grafico,
             ],
             spacing=0,
             alignment=ft.MainAxisAlignment.CENTER,
             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
         )
-
-    return ft.View(
-    route="/desempenho",
-    controls=[
-        appbar,
-        navbar,
+   
+    page.add(appbar, navbar)
+    page.add(
         topo,
         ft.Column(
-            controls=[botoes],
-            spacing=20,
+            [
+                ft.Container(
+                    content=segmented_button,
+                    alignment=ft.alignment.center,
+                    padding=20
+                )
+            ],
             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-        ),
-        ocorenrias_card,
-    ]
-)
+        )
+    )
+    page.add(ocorenrias_card)
 
+    return ft.View(
+        route="/desempenho",
+        controls=[
+            appbar,
+            content,  # Adicione o conteúdo aqui
+            navbar
+        ],
+        vertical_alignment="center",
+        horizontal_alignment="center"
+    )
 
+ft.app(target=DesempenhoView)
