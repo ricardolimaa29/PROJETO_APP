@@ -572,14 +572,14 @@ def HomeView(page: ft.Page):
                             controls=[
                                 ft.Container(
                                     content=ft.Image(
-                                        src=r"img\santana.png",  
-                                        width=70,
-                                        height=70,
+                                        src=r"PROJETO_APP-main\img\logo_santana.jpg",  
+                                        width=90,
+                                        height=90,
                                         fit=ft.ImageFit.COVER
                                     ),
-                                    width=70,
-                                    height=70,
-                                    border_radius=35,
+                                    width=80,
+                                    height=80,
+                                    border_radius=45,
                                     on_click=lambda e: abrir_link(e, "https://prefeitura.santanadeparnaiba.sp.gov.br/Plataforma/smti/fabrica-de-programadores"),
                                     ink=True,
                                 ),
@@ -592,14 +592,14 @@ def HomeView(page: ft.Page):
                             controls=[
                                 ft.Container(
                                     content=ft.Image(
-                                        src=r"img\portifolio.jpg",
+                                        src=r"PROJETO_APP-main\img\portifolio.jpg",
                                         width=70,
                                         height=70,
                                         fit=ft.ImageFit.COVER
                                     ),
-                                    width=70,
-                                    height=70,
-                                    border_radius=35,
+                                    width=80,
+                                    height=80,
+                                    border_radius=15,
                                     on_click=lambda e: abrir_link(e, "https://github.com"),
                                     ink=True,
                                 ),
@@ -612,14 +612,14 @@ def HomeView(page: ft.Page):
                             controls=[
                                 ft.Container(
                                     content=ft.Image(
-                                        src=r"img\senai.jpg",
+                                        src=r"PROJETO_APP-main\img\senai.jpg",
                                         width=70,
                                         height=70,
                                         fit=ft.ImageFit.COVER
                                     ),
-                                    width=70,
-                                    height=70,
-                                    border_radius=35,
+                                    width=80,
+                                    height=80,
+                                    border_radius=45,
                                     on_click=lambda e: abrir_link(e, "https://www.sp.senai.br/"),
                                     ink=True,
                                 ), 
