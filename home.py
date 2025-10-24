@@ -99,10 +99,13 @@ def HomeView(page: ft.Page):
         }
         return control
 
-    # MODAL PARA CONTROLE DE FONTE
+    # MODAL PARA CONTROLE DE FONTE 
     font_modal = ft.AlertDialog(
         modal=True,
-        title=ft.Text("Tamanho da Fonte"),
+        title=ft.Container(
+            content=ft.Text("Tamanho da Fonte", text_align=TextAlign.CENTER),
+            alignment=ft.alignment.center
+        ),
         content=ft.Column(
             width=300,
             tight=True,
@@ -111,7 +114,7 @@ def HomeView(page: ft.Page):
                     alignment="center",
                     controls=[
                         ft.Text("Tamanho atual: ", size=16),
-                        modal_current_percent_text,  # Usa o controle que será atualizado
+                        modal_current_percent_text,
                     ]
                 ),
                 ft.Divider(),
@@ -142,7 +145,7 @@ def HomeView(page: ft.Page):
                     ]
                 ),
                 ft.Container(height=10),
-                modal_scale_indicator,  # Usa o controle que será atualizado
+                modal_scale_indicator,
             ]
         ),
         actions=[
@@ -153,6 +156,8 @@ def HomeView(page: ft.Page):
 
     # ADICIONAR MODAL À PÁGINA
     page.overlay.append(font_modal)
+
+    # ... (o restante do código permanece igual)
 
     # SCROLL AUTOMÁTICO CONFIGURADO (SEM THREAD PROBLEMÁTICA)
     page.scroll = ft.ScrollMode.AUTO
@@ -296,8 +301,8 @@ def HomeView(page: ft.Page):
         center_title=True,
         bgcolor=ft.Colors.SURFACE_CONTAINER_HIGHEST,  
         actions=[ 
-            ft.IconButton(ft.Icons.HEARING, tooltip="Acessibilidade"),
-            font_control_btn,  # APENAS UM BOTÃO AGORA
+            
+            font_control_btn,
             ft.PopupMenuButton(
                 items=[
                     ft.PopupMenuItem(
@@ -306,14 +311,14 @@ def HomeView(page: ft.Page):
                         on_click=mudar_tema
                     ),
                     ft.PopupMenuItem(
-                        text="ACESSIBILIDADE",
+                        text="FEEDBACK",
                         icon="SUN", 
-                        on_click=lambda e: print("Acessibilidade")
+                        on_click=lambda e: print("FEEDBACK")
                     ),
                     ft.PopupMenuItem(
                         text="CONFIGURAÇÕES",
                         icon="SETTINGS_OUTLINED", 
-                        on_click=lambda e: print("Configurações")
+                        on_click=lambda e: print("CONFIGURAÇÕES")
                     ),
                     ft.PopupMenuItem(
                         text="SUPORTE",
@@ -324,7 +329,7 @@ def HomeView(page: ft.Page):
                     ft.PopupMenuItem(
                         text="SAIR",
                         icon="CLOSE_ROUNDED", 
-                        on_click=lambda e: print("Sair")
+                        on_click=lambda e: print("SAIR")
                     ),        
                 ]
             ),
@@ -344,9 +349,8 @@ def HomeView(page: ft.Page):
         "user_role"
     )
 
-    # Criando o botão com text e icon corretamente
     edit_profile_button = ft.ElevatedButton(
-        text="Editar Perfil",  # Texto diretamente no botão
+        text="Editar Perfil",
         icon=ft.Icons.EDIT_ROUNDED,
         style=ft.ButtonStyle(
             padding=ft.padding.symmetric(horizontal=20, vertical=10),
