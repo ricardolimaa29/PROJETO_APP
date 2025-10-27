@@ -2,7 +2,8 @@
 
 <div align="center">
   
-![Ui Ux GIF by DataCamp](https://github.com/user-attachments/assets/f3178b0b-84c9-4b26-b897-853256edcff5)
+<img width="1024" height="1536" alt="20251027_1343_Lançamento App-Fábrica Tecnológico_simple_compose_01k8k8ryq9fe08ynws3bwez42t" src="https://github.com/user-attachments/assets/96642998-210c-4385-8cdc-56b914a519c0" />
+
 
 </div>  
 
