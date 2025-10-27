@@ -24,7 +24,11 @@ O objetivo é **aprender na prática** como funciona o desenvolvimento de um apl
 - Deploy em **Android** e **iOS**.  
 
 <div align="center">
-  <img src="https://media.giphy.com/media/QpVUMRUJGokfqXyfa1/giphy.gif" width="500px" alt="Mobile Demo"/>
+ 
+
+https://github.com/user-attachments/assets/3da45d0a-e907-4cb3-88f4-8057cf9e5028
+
+
 </div>  
 
 ---
