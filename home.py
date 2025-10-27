@@ -191,7 +191,7 @@ def HomeView(page: ft.Page):
     carousel_index = 0
 
     carousel_image = ft.Image(
-        src=f"img/{carousel_images[0]}",
+        src=f"app\src\img\{carousel_images[0]}",
         width=450,
         height=200,
         fit=ft.ImageFit.COVER,
@@ -199,7 +199,7 @@ def HomeView(page: ft.Page):
     )
 
     def update_carousel():
-        carousel_image.src = f"img/{carousel_images[carousel_index]}"
+        carousel_image.src = f"app\src\img/{carousel_images[carousel_index]}"
         for i, dot in enumerate(dots.controls):
             dot.bgcolor = ft.Colors.DEEP_ORANGE if i == carousel_index else ft.Colors.WHITE24
         page.update()
@@ -280,7 +280,7 @@ def HomeView(page: ft.Page):
         print(f"Tema alterado para: {page.theme_mode}")
         page.update()
 
-    # ===================================== ELEMENTOS DA INTERFACE
+
     # TÍTULO DO APP BAR
     appbar_title = register_text_control(
         ft.Text("FÁBRICA DE PROGRAMADORES", weight="bold"),
@@ -297,11 +297,10 @@ def HomeView(page: ft.Page):
 
     appbar = ft.AppBar(
         leading_width=10,
-        title=appbar_title,
+        title=ft.Text("FÁBRICA DE PROGRAMADORES", weight="bold"),
         center_title=True,
         bgcolor=ft.Colors.SURFACE_CONTAINER_HIGHEST,  
         actions=[ 
-            
             font_control_btn,
             ft.PopupMenuButton(
                 items=[
@@ -325,11 +324,11 @@ def HomeView(page: ft.Page):
                         icon="HELP_OUTLINE_ROUNDED", 
                         on_click=ir_para_suporte
                     ),
-                    ft.PopupMenuItem(),
+                    
                     ft.PopupMenuItem(
                         text="SAIR",
                         icon="CLOSE_ROUNDED", 
-                        on_click=lambda e: print("SAIR")
+                        on_click=lambda e:page.close()
                     ),        
                 ]
             ),
@@ -365,7 +364,7 @@ def HomeView(page: ft.Page):
             controls=[
                 ft.Container(
                     content=ft.Image(
-                        src=r"img\perfil.png",
+                        src=r"app\src\img\perfil.png",
                         width=110,
                         height=110,
                         fit=ft.ImageFit.COVER,
@@ -486,13 +485,13 @@ def HomeView(page: ft.Page):
                 ft.Container(
                     content=ft.Column([
                         ft.ListTile(
-                            leading=ft.Image(src=r"img\python.jpg"),
+                            leading=ft.Image(src=r"app\src\img\python.jpg"),
                             title=python_title,
                             subtitle=python_subtitle,
                             trailing=ft.Icon(ft.Icons.CHECK_CIRCLE_ROUNDED, color=ft.Colors.GREEN)
                         ),
                         ft.ListTile(
-                            leading=ft.Image(src=r"img\api.jpg"),
+                            leading=ft.Image(src=r"app\src\img\api.jpg"),
                             title=api_title,
                             subtitle=api_subtitle,
                             trailing=ft.Container(
@@ -572,7 +571,7 @@ def HomeView(page: ft.Page):
                             controls=[
                                 ft.Container(
                                     content=ft.Image(
-                                        src=r"PROJETO_APP-main\img\logo_santana.jpg",  
+                                        src=r"app\src\img\logo_santana.jpg",  
                                         width=90,
                                         height=90,
                                         fit=ft.ImageFit.COVER
@@ -592,7 +591,7 @@ def HomeView(page: ft.Page):
                             controls=[
                                 ft.Container(
                                     content=ft.Image(
-                                        src=r"PROJETO_APP-main\img\portifolio.jpg",
+                                        src=r"app\src\img\portifolio.jpg",
                                         width=70,
                                         height=70,
                                         fit=ft.ImageFit.COVER
@@ -612,7 +611,7 @@ def HomeView(page: ft.Page):
                             controls=[
                                 ft.Container(
                                     content=ft.Image(
-                                        src=r"PROJETO_APP-main\img\senai.jpg",
+                                        src=r"app\src\img\senai.jpg",
                                         width=70,
                                         height=70,
                                         fit=ft.ImageFit.COVER
