@@ -26,7 +26,11 @@ O objetivo é **aprender na prática** como funciona o desenvolvimento de um apl
 <div align="center">
  
 
-https://github.com/user-attachments/assets/3da45d0a-e907-4cb3-88f4-8057cf9e5028
+
+https://github.com/user-attachments/assets/3dc727c5-5114-4b3e-a241-a1a82271f90a
+
+
+
 
 
 </div>  
