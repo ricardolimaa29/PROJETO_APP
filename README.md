@@ -25,13 +25,7 @@ O objetivo é **aprender na prática** como funciona o desenvolvimento de um apl
 
 <div align="center">
  
-
-
 https://github.com/user-attachments/assets/3dc727c5-5114-4b3e-a241-a1a82271f90a
-
-
-
-
 
 </div>  
 
@@ -51,6 +45,9 @@ https://github.com/user-attachments/assets/3dc727c5-5114-4b3e-a241-a1a82271f90a
 ```bash
 # Clone o repositório
 git clone https://github.com/ricardolimaa29/PROJETO_APP.git
+
+# Crie um App no Flet
+flet create App
 
 # Acesse a pasta
 cd app-mobile-fabrica
