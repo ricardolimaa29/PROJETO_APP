@@ -4,14 +4,7 @@ import os
 import re
 
 def PerfilView(page: ft.Page):
-    page.title = "Perfil"
     page.theme_mode = "dark"
-    page.window.width = 500
-    page.window.min_width = 500
-    page.window.max_width = 500
-    page.window.height = 800
-    page.window.min_height = 800
-    page.window.max_height = 800
     page.horizontal_alignment = "center"
     page.vertical_alignment = "start"
 
@@ -32,7 +25,7 @@ def PerfilView(page: ft.Page):
     telefone_inicial = usuario.get("telefone", "(11) 99999-9999")
     genero = usuario.get("genero", "O")  # "F", "M" ou "O"
 
-    # ---------- Escolher imagem de perfil pelo gênero ----------
+    # ---------- Imagem ----------
     if genero == "F":
         imagem_base = "fem.jpeg"
     elif genero == "M":
@@ -40,7 +33,6 @@ def PerfilView(page: ft.Page):
     else:
         imagem_base = "outro.jpeg"
 
-    # Se o usuário tiver uma imagem personalizada, substitui:
     if usuario.get("imagem_personalizada"):
         imagem_base = usuario["imagem_personalizada"]
 
@@ -57,12 +49,25 @@ def PerfilView(page: ft.Page):
             page.theme = ft.Theme(color_scheme_seed=ft.Colors.DEEP_ORANGE)
         page.update()
 
-    def show_snackbar(message, color="RED"):
-        page.open(ft.SnackBar(ft.Text(message, color="White"), bgcolor=color, duration=3000))
+    def clicou_menu(e):
+        item = e.control.text
+        print(f"Item clicado: {item}")
 
-    # ---------- Barra superior ----------
-    page.appbar = ft.AppBar(
-        leading=ft.IconButton(ft.Icons.ARROW_BACK, icon_color="white", tooltip="Voltar", on_click=voltar),
+    def show_snackbar(message, color="RED"):
+        page.open(ft.SnackBar(
+            ft.Text(message, color="White"),
+            bgcolor=color,
+            duration=3000
+        ))
+
+
+    app_bar = ft.AppBar(
+        leading=ft.IconButton(
+            ft.Icons.ARROW_BACK,
+            icon_color="white",
+            tooltip="Voltar",
+            on_click=voltar,
+        ),
         leading_width=40,
         title=ft.Text("FÁBRICA DE PROGRAMADORES", weight="bold"),
         center_title=True,
@@ -71,23 +76,25 @@ def PerfilView(page: ft.Page):
             ft.PopupMenuButton(
                 items=[
                     ft.PopupMenuItem(text="TEMA", icon="WB_SUNNY_OUTLINED", on_click=mudar_tema),
-                    ft.PopupMenuItem(text="SUPORTE", icon="HELP_OUTLINE_ROUNDED"),
+                    ft.PopupMenuItem(text="ACESSIBILIDADE", icon="ACCESSIBILITY", on_click=clicou_menu),
+                    ft.PopupMenuItem(text="CONFIGURAÇÕES", icon="SETTINGS_OUTLINED", on_click=clicou_menu),
+                    ft.PopupMenuItem(text="SUPORTE", icon="HELP_OUTLINE_ROUNDED", on_click=clicou_menu),
                     ft.PopupMenuItem(),
-                    ft.PopupMenuItem(text="SAIR", icon="CLOSE_ROUNDED"),
+                    ft.PopupMenuItem(text="SAIR", icon="CLOSE_ROUNDED", on_click=clicou_menu),
                 ]
-            )
-        ]
+            ),
+        ],
     )
+    # -------------------------------------------------------------
 
-    # ---------- Foto de perfil ----------
+    # ---------- Foto de perfil e Campos ----------
     foto = ft.Image(src=imagem_base, fit=ft.ImageFit.COVER, width=110, height=110)
-
+    
     def foto_escolhida(e: ft.FilePickerResultEvent):
         if e.files:
             caminho = e.files[0].path
             foto.src = caminho
             usuario["imagem_personalizada"] = caminho
-            # Salvar imagem escolhida no session.json
             with open("session.json", "w") as f:
                 json.dump(usuario, f, indent=4)
             foto.update()
@@ -133,7 +140,6 @@ def PerfilView(page: ft.Page):
         bgcolor=ft.Colors.BLACK,
     )
 
-    # ---------- Campos ----------
     def campo_personalizado(label, valor, read_only=True):
         return ft.Container(
             content=ft.TextField(
@@ -169,11 +175,8 @@ def PerfilView(page: ft.Page):
         telefone_formatado = telefone_field.content.value.strip()
 
         # Validações
-        if not re.fullmatch(r"^[A-Za-zÀ-ÿ\s]+$", nome):
-            show_snackbar("Nome inválido! Use apenas letras e espaços.")
-            return
-        if len(nome) < 10:
-            show_snackbar("Nome inválido! Deve ter no mínimo 10 caracteres.")
+        if not re.fullmatch(r"^[A-Za-zÀ-ÿ\s]+$", nome) or len(nome) < 10:
+            show_snackbar("Nome inválido! Use apenas letras e espaços (min. 10 caracteres).")
             return
         telefone_limpo = re.sub(r'[\(\)\-\s]', '', telefone_formatado)
         if not telefone_limpo.isdigit() or len(telefone_limpo) != 11:
@@ -198,12 +201,14 @@ def PerfilView(page: ft.Page):
         show_snackbar("Perfil atualizado com sucesso!", color="GREEN")
         page.update()
 
-    editar_button = ft.ElevatedButton("Editar Perfil", on_click=habilitar_edicao, bgcolor="white", color="black", width=100)
-    atualizar_button = ft.ElevatedButton("Atualizar Perfil", on_click=atualizar_perfil, visible=False, bgcolor="white", color="black", width=100)
+    editar_button = ft.ElevatedButton("Editar Perfil", on_click=habilitar_edicao, bgcolor="white", color="black", width=120)
+    atualizar_button = ft.ElevatedButton("Atualizar Perfil", on_click=atualizar_perfil, visible=False, bgcolor="white", color="black", width=140)
 
+    # ---------- Return View ----------
     return ft.View(
         route="/perfil",
         controls=[
+            app_bar, 
             ft.Column(
                 [
                     ft.Container(height=20),
@@ -220,6 +225,6 @@ def PerfilView(page: ft.Page):
                 scroll=ft.ScrollMode.AUTO
             )
         ],
-        vertical_alignment="center",
+        vertical_alignment="start", 
         horizontal_alignment="center",
     )
