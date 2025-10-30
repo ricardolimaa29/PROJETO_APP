@@ -1,11 +1,13 @@
 from flet import *
 import flet as ft
-
+# import matplotlib.pyplot as plt
+# import io
+# import base64
 
 def DesempenhoView(page: ft.Page):
    
     page.theme_mode = ft.ThemeMode.DARK
-    page.theme = ft.Theme(color_scheme_seed=ft.Colors.DEEP_ORANGE)
+    page.theme = ft.Theme(color_scheme_seed=ft.Colors.INDIGO)
     page.title = "PROGRAMADORES"
     page.window.width = 500
     page.window.height = 800
@@ -201,11 +203,14 @@ def DesempenhoView(page: ft.Page):
     )
 
     # ===================================== CRIANDO ELEMENTOS
+    from home import HomeView
+    def voltar_home(a):
+        page.views.append(HomeView(page))
 
     appbar = ft.AppBar(
     leading=ft.IconButton(
         ft.Icons.ARROW_BACK,
-        on_click=lambda _:page.go('/home'),
+        on_click=voltar_home,
     ), 
     title=ft.Text("DESEMPENHO", weight="bold"),  # título da AppBar
     bgcolor=ft.Colors.SURFACE_CONTAINER_HIGHEST,  # cor de fundo
@@ -262,16 +267,7 @@ def DesempenhoView(page: ft.Page):
         on_change=mudar_tela
     )
 
-    # Conteúdo principal da tela de Desempenho
-    content = ft.Column(
-        controls=[
-            ft.Text("Tela de Desempenho", size=24, weight="bold"),
-            ft.Text("Aqui você pode ver suas estatísticas e progresso."),
-        ],
-        alignment="center",
-        horizontal_alignment="center",
-        expand=True
-    )
+    
 
     card_colegio = ft.ResponsiveRow([
         ft.Container(
@@ -345,8 +341,6 @@ def DesempenhoView(page: ft.Page):
         expand=True,  # deixa o row expandir na tela
     )
 
-    
-
 
     topo = ft.Column(
             [
@@ -354,21 +348,24 @@ def DesempenhoView(page: ft.Page):
                 ft.Container(height=10),
                 card_situacao,
                 grafico_container,
+                segmented_button,
                 # grafico,
             ],
             spacing=0,
             alignment=ft.MainAxisAlignment.CENTER,
             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
         )
-    page.add(ocorenrias_card)
+   
 
     return ft.View(
         route="/desempenho",
         controls=[
+            topo,
             appbar,
-            content,  # Adicione o conteúdo aqui
-            navbar
+            navbar,
+            ocorenrias_card
         ],
         vertical_alignment="center",
         horizontal_alignment="center"
     )
+
