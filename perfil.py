@@ -46,7 +46,7 @@ def PerfilView(page: ft.Page):
             page.theme = ft.Theme(color_scheme_seed=ft.Colors.INDIGO)
         else:
             page.theme_mode = ft.ThemeMode.DARK
-            page.theme = ft.Theme(color_scheme_seed=ft.Colors.DEEP_ORANGE)
+            page.theme = ft.Theme(color_scheme_seed=ft.Colors.INDIGO)
         page.update()
 
     def clicou_menu(e):

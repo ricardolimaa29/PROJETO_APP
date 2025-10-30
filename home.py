@@ -6,7 +6,7 @@ import threading
 def HomeView(page: ft.Page):
     
     page.theme_mode = ft.ThemeMode.DARK 
-    page.theme = ft.Theme(color_scheme_seed=ft.Colors.DEEP_ORANGE)
+    page.theme = ft.Theme(color_scheme_seed=ft.Colors.INDIGO)
     page.title = "PROGRAMADORES"
 
     # VARIÁVEL PARA CONTROLE DO TAMANHO DA FONTE
@@ -201,7 +201,7 @@ def HomeView(page: ft.Page):
     def update_carousel():
         carousel_image.src = f"app\src\img/{carousel_images[carousel_index]}"
         for i, dot in enumerate(dots.controls):
-            dot.bgcolor = ft.Colors.DEEP_ORANGE if i == carousel_index else ft.Colors.WHITE24
+            dot.bgcolor = ft.Colors.INDIGO if i == carousel_index else ft.Colors.WHITE24
         page.update()
 
     def next_slide(e=None):
@@ -224,13 +224,13 @@ def HomeView(page: ft.Page):
     dots = ft.Row(
         controls=[
             ft.Container(width=10, height=10, border_radius=20,
-                         bgcolor=ft.Colors.DEEP_ORANGE if i == 0 else ft.Colors.WHITE24)
+                         bgcolor=ft.Colors.INDIGO if i == 0 else ft.Colors.WHITE24)
             for i in range(len(carousel_images))
         ],
         alignment=ft.MainAxisAlignment.CENTER,
         spacing=5
     )
-    dots.controls[0].bgcolor = ft.Colors.DEEP_ORANGE
+    dots.controls[0].bgcolor = ft.Colors.INDIGO
 
     carousel = ft.Container(
         content=ft.Stack(
@@ -276,7 +276,7 @@ def HomeView(page: ft.Page):
             page.theme = ft.Theme(color_scheme_seed=ft.Colors.INDIGO)
         else:
             page.theme_mode = ft.ThemeMode.DARK
-            page.theme = ft.Theme(color_scheme_seed=ft.Colors.DEEP_ORANGE)
+            page.theme = ft.Theme(color_scheme_seed=ft.Colors.INDIGO)
         print(f"Tema alterado para: {page.theme_mode}")
         page.update()
 

@@ -33,7 +33,7 @@ def DesempenhoView(page: ft.Page):
             page.theme = ft.Theme(color_scheme_seed=ft.Colors.INDIGO)
         else:
             page.theme_mode = ft.ThemeMode.DARK
-            page.theme = ft.Theme(color_scheme_seed=ft.Colors.DEEP_ORANGE)
+            page.theme = ft.Theme(color_scheme_seed=ft.Colors.INDIGO)
         print(f"Tema alterado para: {page.theme_mode}")
         
         # # Atualizar o gráfico quando o tema mudar
@@ -66,7 +66,7 @@ def DesempenhoView(page: ft.Page):
                             from_y=0,
                             to_y=notas[i],
                             width=20,
-                            color=ft.Colors.DEEP_ORANGE,
+                            color=ft.Colors.INDIGO,
                             border_radius=0,
                             tooltip=f"Nota: {notas[i]}%",
                         ),
@@ -93,7 +93,7 @@ def DesempenhoView(page: ft.Page):
                             from_y=0,
                             to_y=notas[i],
                             width=20,
-                            color=ft.Colors.DEEP_ORANGE,
+                            color=ft.Colors.INDIGO,
                             border_radius=0,
                             tooltip=f"Nota: {notas[i]}%",
                         ),
@@ -101,7 +101,7 @@ def DesempenhoView(page: ft.Page):
                             from_y=0,
                             to_y=notas[i],
                             width=20,
-                            color=ft.Colors.DEEP_ORANGE,
+                            color=ft.Colors.INDIGO,
                             border_radius=0,
                             tooltip=f"Nota: {notas[i]}%",
                         ),
