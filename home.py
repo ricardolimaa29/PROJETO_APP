@@ -2,6 +2,9 @@ import flet as ft
 from flet import *
 import time
 import threading
+import json
+from pathlib import Path
+import os
 
 def HomeView(page: ft.Page):
     
@@ -28,6 +31,8 @@ def HomeView(page: ft.Page):
         color=ft.Colors.WHITE
     )
 
+    # Carrega perfil inicial do arquivo JSON
+ 
     # FUNÇÃO PARA ATUALIZAR O MODAL
     def update_modal_display():
         modal_current_percent_text.value = f"{int(current_font_scale * 100)}%"
@@ -358,17 +363,109 @@ def HomeView(page: ft.Page):
         on_click=ir_para_perfil
     )
 
+    # Imagem do perfil (variável para permitir atualização dinâmica)
+    profile_image = ft.Image(
+        src=r"app\src\img\perfil.png",
+        width=110,
+        height=110,
+        fit=ft.ImageFit.COVER,
+    )
+
+    # Funções para carregar e aplicar perfil do arquivo JSON
+    def _perfil_json_path():
+        try:
+            base = Path(__file__).resolve().parent.parent
+        except Exception:
+            base = Path(os.getcwd())
+        return base / "perfil_usuario.json"
+
+    def load_profile_from_file():
+        path = _perfil_json_path()
+        if not path.exists():
+            print(f"Arquivo de perfil não encontrado em: {path}")
+            return {}
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            return data if isinstance(data, dict) else {}
+        except Exception as e:
+            print(f"Erro ao ler perfil: {e}")
+            return {}
+
+    def apply_profile_to_view(profile: dict):
+        try:
+            nome = profile.get("nome") or profile.get("Nome")
+            email = profile.get("email") or profile.get("Email")
+            foto = profile.get("foto") or profile.get("Foto")
+            if nome:
+                user_name.value = nome
+            if email:
+                user_role.value = email
+            if foto:
+                if isinstance(foto, str) and (foto.startswith("http://") or foto.startswith("https://")):
+                    profile_image.src = foto
+                else:
+                    # tenta caminhos locais
+                    local_path = Path(foto)
+                    if not local_path.exists():
+                        candidate = Path(__file__).resolve().parent / foto
+                        if candidate.exists():
+                            profile_image.src = str(candidate)
+                        else:
+                            profile_image.src = r"app\src\img\perfil.png"
+                    else:
+                        profile_image.src = str(local_path)
+            page.update()
+        except Exception as e:
+            print(f"Erro ao aplicar perfil na view: {e}")
+
+    def reload_profile(e=None):
+        profile = load_profile_from_file()
+        apply_profile_to_view(profile)
+
+    # Watcher para perfil: monitora o arquivo perfil_usuario.json e recarrega quando mudar
+    watcher_started = False
+
+    def start_profile_watcher(poll_interval: float = 1.0):
+        nonlocal watcher_started
+        if watcher_started:
+            return
+        watcher_started = True
+
+        def watcher():
+            path = _perfil_json_path()
+            try:
+                last_mtime = path.stat().st_mtime if path.exists() else 0
+            except Exception:
+                last_mtime = 0
+            while True:
+                try:
+                    time.sleep(poll_interval)
+                    if not path.exists():
+                        continue
+                    mtime = path.stat().st_mtime
+                    if mtime != last_mtime:
+                        last_mtime = mtime
+                        # schedule reload on the main thread
+                        try:
+                            page.call_later(lambda: reload_profile())
+                        except Exception:
+                            # fallback: call directly (may be unsafe in some environments)
+                            try:
+                                reload_profile()
+                            except Exception as e:
+                                print(f"Erro ao recarregar perfil pelo watcher: {e}")
+                except Exception as e:
+                    print(f"Erro no profile watcher: {e}")
+
+        threading.Thread(target=watcher, daemon=True).start()
+
     perfil = ft.Container(
         content=ft.Row(
             spacing=20,
             controls=[
                 ft.Container(
-                    content=ft.Image(
-                        src=r"app\src\img\perfil.png",
-                        width=110,
-                        height=110,
-                        fit=ft.ImageFit.COVER,
-                    ),
+                    content=profile_image,
                     width=110,
                     height=110,
                     border_radius=55,
@@ -380,7 +477,13 @@ def HomeView(page: ft.Page):
                     controls=[
                         user_name,
                         user_role,
-                        edit_profile_button
+                        ft.Row(
+                            spacing=8,
+                            controls=[
+                                edit_profile_button,
+                                ft.IconButton(ft.Icons.REFRESH, tooltip="Atualizar perfil", on_click=reload_profile)
+                            ]
+                        )
                     ]
                 )
             ]
@@ -651,6 +754,12 @@ def HomeView(page: ft.Page):
     # APLICA O TAMANHO INICIAL DA FONTE
     apply_font_size()
 
+    # Carrega o perfil agora que todos os controles e funções foram definidos.
+    try:
+        reload_profile()
+    except Exception as e:
+        print(f"Falha ao carregar perfil na inicialização da view: {e}")
+
     # View final
     view = ft.View(
         route="/home",
@@ -665,6 +774,11 @@ def HomeView(page: ft.Page):
     # Inicia o scroll automático após a view estar pronta
     def on_view_loaded(e):
         start_auto_scroll()
+        # inicia watcher para live-reload do perfil (ex.: login via Google atualiza perfil_usuario.json)
+        try:
+            start_profile_watcher()
+        except Exception as ex:
+            print(f"Não foi possível iniciar profile watcher: {ex}")
     
     # Adiciona um evento para quando a view for carregada
     view.on_load = on_view_loaded
