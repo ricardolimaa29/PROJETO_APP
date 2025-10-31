@@ -2,19 +2,37 @@ import flet as ft
 import json
 import os
 import re
+from pathlib import Path
 
 def PerfilView(page: ft.Page):
     page.theme_mode = "dark"
     page.horizontal_alignment = "center"
     page.vertical_alignment = "start"
 
-    # ---------- Ler dados do usuário ----------
+    # ---------- Ler dados do usuário (preferência: perfil_usuario.json) ----------
     usuario = {}
-    if os.path.exists("session.json"):
-        with open("session.json", "r") as f:
+
+    def _perfil_json_path():
+        try:
+            base = Path(__file__).resolve().parent
+            # perfil_usuario.json está na raiz do projeto (um nível acima)
+            candidate = base.parent / "perfil_usuario.json"
+        except Exception:
+            candidate = Path(os.getcwd()) / "perfil_usuario.json"
+        return candidate
+
+    perfil_path = _perfil_json_path()
+    if perfil_path.exists():
+        try:
+            with open(perfil_path, "r", encoding="utf-8") as f:
+                usuario = json.load(f)
+        except Exception:
+            usuario = {}
+    elif os.path.exists("session.json"):
+        with open("session.json", "r", encoding="utf-8") as f:
             usuario = json.load(f)
     elif os.path.exists("usuarios.json"):
-        with open("usuarios.json", "r") as f:
+        with open("usuarios.json", "r", encoding="utf-8") as f:
             dados = json.load(f)
             if "usuarios" in dados and len(dados["usuarios"]) > 0:
                 usuario = dados["usuarios"][-1]  # pega o último cadastrado
@@ -24,6 +42,7 @@ def PerfilView(page: ft.Page):
     nascimento_inicial = usuario.get("data_nascimento", "01/01/2000")
     telefone_inicial = usuario.get("telefone", "(11) 99999-9999")
     genero = usuario.get("genero", "O")  # "F", "M" ou "O"
+    foto_inicial = usuario.get("foto") or usuario.get("imagem_personalizada")
 
     # ---------- Imagem ----------
     if genero == "F":
@@ -33,8 +52,8 @@ def PerfilView(page: ft.Page):
     else:
         imagem_base = "outro.jpeg"
 
-    if usuario.get("imagem_personalizada"):
-        imagem_base = usuario["imagem_personalizada"]
+    if foto_inicial:
+        imagem_base = foto_inicial
 
     # ---------- Funções ----------
     def voltar(e):
@@ -95,8 +114,15 @@ def PerfilView(page: ft.Page):
             caminho = e.files[0].path
             foto.src = caminho
             usuario["imagem_personalizada"] = caminho
-            with open("session.json", "w") as f:
-                json.dump(usuario, f, indent=4)
+            usuario["foto"] = caminho
+            # salva também em perfil_usuario.json quando possível
+            try:
+                with open(perfil_path, "w", encoding="utf-8") as f:
+                    json.dump(usuario, f, indent=4, ensure_ascii=False)
+            except Exception:
+                # fallback para session.json
+                with open("session.json", "w", encoding="utf-8") as f:
+                    json.dump(usuario, f, indent=4, ensure_ascii=False)
             foto.update()
 
     file_picker = ft.FilePicker(on_result=foto_escolhida)
@@ -191,8 +217,13 @@ def PerfilView(page: ft.Page):
         usuario["email"] = email
         usuario["telefone"] = telefone_formatado
 
-        with open("session.json", "w") as f:
-            json.dump(usuario, f, indent=4)
+        # salvar em perfil_usuario.json (principal) e em session.json como fallback
+        try:
+            with open(perfil_path, "w", encoding="utf-8") as f:
+                json.dump(usuario, f, indent=4, ensure_ascii=False)
+        except Exception:
+            with open("session.json", "w", encoding="utf-8") as f:
+                json.dump(usuario, f, indent=4, ensure_ascii=False)
 
         for campo in [nome_field, email_field, telefone_field]:
             campo.content.read_only = True
