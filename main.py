@@ -6,6 +6,7 @@ from cadastro import CadastroView
 from perfil import PerfilView
 from notificação import View_notificacao
 from suporte import suporte_view
+from detalhes import DetalhesView
 
 
 # CRIAR UM BOTAO PARA INSERIR UM SITE DE PORTFOLIO PARA CADA DEV COM AS INFORMAÇÕES E O LINK PARA GIT
@@ -31,6 +32,8 @@ def main(page: ft.Page):
             page.views.append(suporte_view(page))
         elif page.route == "/desempenho":
             page.views.append(DesempenhoView(page))
+        elif page.route == "/detalhes":
+            page.views.append(DetalhesView(page))
         page.update()
         
 
