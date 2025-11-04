@@ -18,12 +18,13 @@ class MessageManager:
 def View_notificacao(page: ft.Page):
     page.title = "Fabrica de programadores"
     page.theme_mode = "dark"
-    page.window.min_height = 900
+    page.window.min_height = 800
     page.window.min_width = 500
-    page.window.max_height = 900
+    page.window.max_height = 800
     page.window.max_width = 500
     page.window.width = 500
-    page.window.height = 900
+    page.window.height = 800
+    page.window.center()
 
     message_manager = MessageManager()
     
@@ -45,33 +46,8 @@ def View_notificacao(page: ft.Page):
             title_text = "Mensagens Excluídas"
         
        
-        header_row_controls = [
-            ft.IconButton(
-                icon=ft.Icons.ARROW_BACK,
-                icon_color="white",
-                tooltip="Voltar",
-                on_click=lambda e: go_back(),
-            )
-        ]
-        
-        # Título centralizado NO TOPO
-        header_row_controls.append(
-            ft.Container(
-                ft.Row(
-                    [ft.Text(title_text, size=24, weight=ft.FontWeight.BOLD)],
-                    alignment=ft.MainAxisAlignment.CENTER
-                ),
-                
-                expand=True
-            ),
-        )
-        
-        content_column.controls.append(
-            ft.Container(
-                ft.Row(header_row_controls),
-                padding=ft.padding.only(bottom=10)
-            )
-        )
+
+
         
         # Botões de navegação NO TOPO (logo abaixo do título)
         buttons_row = []
@@ -138,7 +114,81 @@ def View_notificacao(page: ft.Page):
         
         content_column.controls.append(list_view)
         page.update()
+    def clicou_menu(e):
+        item = e.control.text
+        if item == "Suporte":
+            print("Abrir suporte...")
+        elif item == "Configurações":
+            print("Abrir configurações...")
+        elif item == "Tema":
+            mudar_tema(None)
 
+    def mudar_tema(e):
+        if page.theme_mode == ft.ThemeMode.DARK:
+            page.theme_mode = ft.ThemeMode.LIGHT
+            page.theme = ft.Theme(color_scheme_seed=ft.Colors.INDIGO)
+        else:
+            page.theme_mode = ft.ThemeMode.DARK
+            page.theme = ft.Theme(color_scheme_seed=ft.Colors.INDIGO)
+        print(f"Tema alterado para: {page.theme_mode}")
+    appbar = ft.AppBar(
+        leading=ft.IconButton(
+            ft.Icons.ARROW_BACK,
+            on_click=lambda _: page.go('/home'),
+        ), 
+        title=ft.Text("NOTIFICAÇÕES", weight="bold"),  # título da AppBar
+        bgcolor=ft.Colors.SURFACE_CONTAINER_HIGHEST,  # cor de fundo
+        actions=[  # ações do lado direito
+            ft.PopupMenuButton(
+                items=[
+                    ft.PopupMenuItem(text="TEMA", icon="WB_SUNNY_OUTLINED", on_click=mudar_tema),
+                    ft.PopupMenuItem(text="CONFIGURAÇÕES", icon="SETTINGS_OUTLINED", on_click=clicou_menu),
+                    ft.PopupMenuItem(text="SUPORTE", icon="HELP_OUTLINE_ROUNDED", on_click=clicou_menu),
+                    ft.PopupMenuItem(),  # separador
+                    ft.PopupMenuItem(text="SAIR", icon="CLOSE_ROUNDED", on_click=lambda e:page.go("/")),
+                ]
+            ),
+        ],
+        )
+     # NAVIGATION BAR
+    def mudar_tela(e):
+        index = e.control.selected_index
+        if index == 0:
+            page.go("/home")
+        elif index == 1:
+            page.go("/desempenho")
+        elif index == 2:
+            page.go("/notificação")
+        elif index == 3:
+            page.go("/perfil")
+
+    navbar = ft.NavigationBar(
+        selected_index=0,
+        destinations=[
+            ft.NavigationBarDestination(
+                icon=ft.Icons.HOME_OUTLINED,
+                selected_icon=ft.Icons.HOME,
+                label="Início"
+            ),
+            ft.NavigationBarDestination(
+                icon=ft.Icons.BAR_CHART_OUTLINED,
+                selected_icon=ft.Icons.BAR_CHART,
+                label="Desempenho"
+            ),
+            ft.NavigationBarDestination(
+                icon=ft.Icons.NOTIFICATIONS_OUTLINED,
+                selected_icon=ft.Icons.NOTIFICATIONS,
+                label="Notificações"
+            ),
+            ft.NavigationBarDestination(
+                icon=ft.Icons.PERSON_OUTLINED,
+                selected_icon=ft.Icons.PERSON,
+                label="Perfil"
+            ),
+        ],
+        on_change=mudar_tela
+    )
+    # -------------------------------------------------------------
     def create_dismissible_item(message, index):
         return ft.Dismissible(
             content=ft.ListTile(
@@ -212,14 +262,6 @@ def View_notificacao(page: ft.Page):
         )
         page.open(details_dlg)
 
-    def delete_archived_message(message):
-        try:
-            message_to_remove = next(msg for msg in message_manager.archived if msg == message)
-            message_manager.archived.remove(message_to_remove)
-            message_manager.deleted.append(message_to_remove)
-            update_view()
-        except (ValueError, StopIteration):
-            update_view()
 
     def restore_archived_message(message):
         try:
@@ -376,13 +418,10 @@ def View_notificacao(page: ft.Page):
 
     content_column = ft.Column()
     
-    # Adiciona o conteúdo à página
-    page.add(content_column)
-    
     # Atualiza a view inicial
     update_view()
 
     return ft.View(
         route="/notificação",
-        controls=[content_column]
+        controls=[appbar,content_column,navbar]
     )
