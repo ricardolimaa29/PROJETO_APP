@@ -1,6 +1,5 @@
 from flet import *
 import flet as ft
-from home import HomeView
 from detalhes import DetalhesView
 
 def DesempenhoView(page: ft.Page):
@@ -14,8 +13,7 @@ def DesempenhoView(page: ft.Page):
     page.window.max_height = 800
     page.window.min_width = 500
     page.window.min_height = 800
-    # page.scroll = 'auto'
-    page.scroll = ft.ScrollMode.AUTOpage.scroll = ft.ScrollMode.AUTO
+    page.scroll = ft.ScrollMode.AUTO
 
     # ===================================== CRIANDO FUNÇÕES DOS ELEMENTOS
     def clicou_menu(e):
@@ -37,20 +35,10 @@ def DesempenhoView(page: ft.Page):
         print(f"Tema alterado para: {page.theme_mode}")
         page.update()
 
-    
-    def voltar_home(a):
-        page.views.append(HomeView(page))
-
-    
-     
-    
-
-
-        #============================================================
     appbar = ft.AppBar(
     leading=ft.IconButton(
         ft.Icons.ARROW_BACK,
-        on_click=voltar_home,
+        on_click=lambda _:page.go('/home'),
     ), 
     title=ft.Text("DESEMPENHO", weight="bold"),  # título da AppBar
     bgcolor=ft.Colors.SURFACE_CONTAINER_HIGHEST,  # cor de fundo
@@ -61,7 +49,7 @@ def DesempenhoView(page: ft.Page):
                 ft.PopupMenuItem(text="CONFIGURAÇÕES", icon="SETTINGS_OUTLINED", on_click=clicou_menu),
                 ft.PopupMenuItem(text="SUPORTE", icon="HELP_OUTLINE_ROUNDED", on_click=clicou_menu),
                 ft.PopupMenuItem(),  # separador
-                ft.PopupMenuItem(text="SAIR", icon="CLOSE_ROUNDED", on_click=clicou_menu),
+                ft.PopupMenuItem(text="SAIR", icon="CLOSE_ROUNDED", on_click=lambda e:page.go("/")),
             ]
         ),
     ],
@@ -319,8 +307,8 @@ def DesempenhoView(page: ft.Page):
     
     def abrir_detalhes(e):
         page.views.append(DetalhesView(page))
-        page.go("/detalhes")  # navega para a view recém adicionada
-        #AeDfRyji
+        page.go("/detalhes") 
+        
 
         
 
