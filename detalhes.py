@@ -11,8 +11,7 @@ def DetalhesView(page: ft.Page):
     page.window.max_height = 800
     page.window.min_width = 500
     page.window.min_height = 800
-    # page.scroll = 'auto'
-    page.scroll = ft.ScrollMode.AUTO
+    page.scroll = 'auto'
 
 
     page.padding = 0
@@ -37,28 +36,22 @@ def DetalhesView(page: ft.Page):
         print(f"Tema alterado para: {page.theme_mode}")
         page.update()
 
-    def sair(e):
-        page.views.pop()  # remove a view atual
-        page.update()
-
-    # def voltar_desempenho(a):
-    #     page.views.append(DesempenhoView(page))
 
     appbar = ft.AppBar(
     leading=ft.IconButton(
         ft.Icons.ARROW_BACK,
-        on_click=sair,
+        on_click=lambda _:page.go('/desempenho'),
     ), 
-    title=ft.Text("DETALHES", weight="bold"),  # título da AppBar
-    bgcolor=ft.Colors.SURFACE_CONTAINER_HIGHEST,  # cor de fundo
-    actions=[  # ações do lado direito
+    title=ft.Text("DETALHES", weight="bold"),  
+    bgcolor=ft.Colors.SURFACE_CONTAINER_HIGHEST,  
+    actions=[  
         ft.PopupMenuButton(
             items=[
                 ft.PopupMenuItem(text="TEMA", icon="WB_SUNNY_OUTLINED", on_click=mudar_tema),
                 ft.PopupMenuItem(text="CONFIGURAÇÕES", icon="SETTINGS_OUTLINED", on_click=clicou_menu),
                 ft.PopupMenuItem(text="SUPORTE", icon="HELP_OUTLINE_ROUNDED", on_click=clicou_menu),
                 ft.PopupMenuItem(),  # separador
-                ft.PopupMenuItem(text="SAIR", icon="CLOSE_ROUNDED", on_click=clicou_menu),
+                ft.PopupMenuItem(text="SAIR", icon="CLOSE_ROUNDED", on_click=lambda e:page.go("/")),
             ]
         ),
     ],
@@ -209,5 +202,4 @@ def DetalhesView(page: ft.Page):
             conteudo
         ]
     )
-
 
