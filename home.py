@@ -188,15 +188,15 @@ def HomeView(page: ft.Page):
 
     # CARROSSEL
     carousel_images = [
-        r"fabrica-programadores-parnaiba.png", 
-        r"sala.jpg", 
-        r"gaby.jpg",
-        r"fabrica.jpg"
+        "https://drive.google.com/uc?export=view&id=1zOqWMKlGG0mFQcfqeK_Pg5Ss-ajbnTsJ",
+        "https://drive.google.com/uc?export=view&id=1LKs2OOezpofLzp31ids0VzfQTLLAZbdg",
+        "https://drive.google.com/uc?export=view&id=12QvqtJIxNfYLqbnvOI35YhUaRGSCzVIw",
+        "https://drive.google.com/uc?export=view&id=1jbHAk5kLxWOJ9WQzfAC5LzlhNOgNm6yB"
     ]
     carousel_index = 0
 
     carousel_image = ft.Image(
-        src=f"app\src\img\{carousel_images[0]}",
+        src=carousel_images[0],
         width=450,
         height=200,
         fit=ft.ImageFit.COVER,
@@ -204,7 +204,7 @@ def HomeView(page: ft.Page):
     )
 
     def update_carousel():
-        carousel_image.src = f"app\src\img/{carousel_images[carousel_index]}"
+        carousel_image.src = carousel_images[carousel_index]
         for i, dot in enumerate(dots.controls):
             dot.bgcolor = ft.Colors.INDIGO if i == carousel_index else ft.Colors.WHITE24
         page.update()
@@ -333,7 +333,7 @@ def HomeView(page: ft.Page):
                     ft.PopupMenuItem(
                         text="SAIR",
                         icon="CLOSE_ROUNDED", 
-                        on_click=lambda e:page.close()
+                        on_click=lambda e:page.go("/")
                     ),        
                 ]
             ),
@@ -577,7 +577,7 @@ def HomeView(page: ft.Page):
     )
 
     eventos = ft.Container(
-        on_click=ir_para_aulas,
+        on_click=lambda _:page.go("/aulasView"),
         ink=True,
         content=ft.Column(
             alignment=ft.alignment.center, 
@@ -588,13 +588,13 @@ def HomeView(page: ft.Page):
                 ft.Container(
                     content=ft.Column([
                         ft.ListTile(
-                            leading=ft.Image(src=r"app\src\img\python.jpg"),
+                            leading=ft.Image(src="https://drive.google.com/uc?export=view&id=1oAQLNXquKlFrXdLdGKQjg1NbTw2i5J_D"),
                             title=python_title,
                             subtitle=python_subtitle,
                             trailing=ft.Icon(ft.Icons.CHECK_CIRCLE_ROUNDED, color=ft.Colors.GREEN)
                         ),
                         ft.ListTile(
-                            leading=ft.Image(src=r"app\src\img\api.jpg"),
+                            leading=ft.Image(src="https://drive.google.com/uc?export=view&id=1VxIPRmy2Q0MTe8tU29uwhV2AxBiZay5D"),
                             title=api_title,
                             subtitle=api_subtitle,
                             trailing=ft.Container(
@@ -674,7 +674,7 @@ def HomeView(page: ft.Page):
                             controls=[
                                 ft.Container(
                                     content=ft.Image(
-                                        src=r"app\src\img\logo_santana.jpg",  
+                                        src="https://drive.google.com/uc?export=view&id=1-sH8Vd08jPu8ZjwpkydJVtRGTSH1_3Ne",  
                                         width=90,
                                         height=90,
                                         fit=ft.ImageFit.COVER
@@ -694,7 +694,7 @@ def HomeView(page: ft.Page):
                             controls=[
                                 ft.Container(
                                     content=ft.Image(
-                                        src=r"app\src\img\portifolio.jpg",
+                                        src="https://drive.google.com/uc?export=view&id=1DzOxTg51XO6DjMfzyD1u3YYmLI8rktLR",
                                         width=70,
                                         height=70,
                                         fit=ft.ImageFit.COVER
@@ -702,7 +702,7 @@ def HomeView(page: ft.Page):
                                     width=80,
                                     height=80,
                                     border_radius=15,
-                                    on_click=lambda e: abrir_link(e, "https://github.com"),
+                                    on_click=lambda e: abrir_link(e, "https://anacastilhoathayde.github.io/Projeto_app/"),
                                     ink=True,
                                 ),
                                 devs_text
@@ -714,7 +714,7 @@ def HomeView(page: ft.Page):
                             controls=[
                                 ft.Container(
                                     content=ft.Image(
-                                        src=r"app\src\img\senai.jpg",
+                                        src="https://drive.google.com/uc?export=view&id=1-q57xFQlgxe3TI_gZFuaOttBfNbmL_ic",
                                         width=70,
                                         height=70,
                                         fit=ft.ImageFit.COVER
@@ -722,7 +722,7 @@ def HomeView(page: ft.Page):
                                     width=80,
                                     height=80,
                                     border_radius=45,
-                                    on_click=lambda e: abrir_link(e, "https://www.sp.senai.br/"),
+                                    on_click=lambda e: abrir_link(e, "https://www.sp.senai.br/santanadeparnaiba"),
                                     ink=True,
                                 ), 
                                 senai_text
