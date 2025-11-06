@@ -69,7 +69,7 @@ def DesempenhoView(page: ft.Page):
             
     # Configurando o NavigationBar
     navbar = ft.NavigationBar(
-        selected_index=0,
+        selected_index=1,
         destinations=[
             ft.NavigationBarDestination(
                 icon=ft.Icons.HOME_OUTLINED,

@@ -165,7 +165,7 @@ def View_notificacao(page: ft.Page):
             page.go("/perfil")
 
     navbar = ft.NavigationBar(
-        selected_index=0,
+        selected_index=2,
         destinations=[
             ft.NavigationBarDestination(
                 icon=ft.Icons.HOME_OUTLINED,
