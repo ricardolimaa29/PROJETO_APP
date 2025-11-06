@@ -105,7 +105,9 @@ def PerfilView(page: ft.Page):
     )
 
     # ---------- Foto de perfil e Campos ----------
-    foto = ft.Image(src=imagem_base, fit=ft.ImageFit.COVER, width=110, height=110)
+    # Use uma única constante para controlar o tamanho da foto/moldura
+    PHOTO_SIZE = 110
+    foto = ft.Image(src=imagem_base, fit=ft.ImageFit.COVER, width=PHOTO_SIZE, height=PHOTO_SIZE)
     
     def foto_escolhida(e: ft.FilePickerResultEvent):
         if e.files:
@@ -141,25 +143,27 @@ def PerfilView(page: ft.Page):
         width=40, height=40, alignment=ft.alignment.center,
     )
 
+    # Stack com a imagem e o botão de alterar
     foto_stack = ft.Stack(
         controls=[
             ft.Container(
                 content=foto,
-                width=110, height=110,
-                border_radius=55,
+                width=PHOTO_SIZE, height=PHOTO_SIZE,
+                border_radius=PHOTO_SIZE // 2,
                 clip_behavior=ft.ClipBehavior.HARD_EDGE
             ),
             ft.Container(content=botao_alterar, alignment=ft.alignment.top_left, padding=5),
         ],
-        width=120, height=120,
+        width=PHOTO_SIZE, height=PHOTO_SIZE,
     )
 
+    # Moldura com o mesmo tamanho da foto (sem padding extra) para manter dimensões idênticas
     foto_moldura = ft.Container(
         content=foto_stack,
-        padding=6,
+        padding=0,
         border=ft.border.all(2, ft.Colors.WHITE24),
-        border_radius=70,
-        width=132, height=132,
+        border_radius=PHOTO_SIZE // 2,
+        width=PHOTO_SIZE, height=PHOTO_SIZE,
         alignment=ft.alignment.center,
         bgcolor=ft.Colors.BLACK,
     )
