@@ -1,4 +1,6 @@
 import flet as ft
+import time
+import threading
 
 class MessageManager:
     def __init__(self):
@@ -416,12 +418,28 @@ def View_notificacao(page: ft.Page):
     def handle_update(e: ft.DismissibleUpdateEvent):
         pass
 
-    content_column = ft.Column()
+    # Cria coluna principal para conteúdo
+    content_column = ft.Column(
+        expand=True,
+        scroll=ft.ScrollMode.AUTO
+    )
+
+    # Configura scroll automático para a página
+    page.scroll = ft.ScrollMode.AUTO
     
     # Atualiza a view inicial
     update_view()
-
-    return ft.View(
+    
+    # Monta a view final
+    view = ft.View(
         route="/notificação",
-        controls=[appbar,content_column,navbar]
+        controls=[
+            appbar,
+            content_column,
+            navbar
+        ],
+        vertical_alignment="start",
+        horizontal_alignment="center"
     )
+    
+    return view

@@ -79,7 +79,6 @@ def PerfilView(page: ft.Page):
             duration=3000
         ))
 
-
     app_bar = ft.AppBar(
         leading=ft.IconButton(
             ft.Icons.ARROW_BACK,
@@ -99,12 +98,11 @@ def PerfilView(page: ft.Page):
                     ft.PopupMenuItem(text="CONFIGURAÇÕES", icon="SETTINGS_OUTLINED", on_click=clicou_menu),
                     ft.PopupMenuItem(text="SUPORTE", icon="HELP_OUTLINE_ROUNDED", on_click=clicou_menu),
                     ft.PopupMenuItem(),
-                    ft.PopupMenuItem(text="SAIR", icon="CLOSE_ROUNDED", on_click=lambda e:page.go("/")),
+                    ft.PopupMenuItem(text="SAIR", icon="CLOSE_ROUNDED", on_click=lambda e: page.go("/")),
                 ]
             ),
         ],
     )
-    # -------------------------------------------------------------
 
     # ---------- Foto de perfil e Campos ----------
     foto = ft.Image(src=imagem_base, fit=ft.ImageFit.COVER, width=110, height=110)
@@ -235,6 +233,45 @@ def PerfilView(page: ft.Page):
     editar_button = ft.ElevatedButton("Editar Perfil", on_click=habilitar_edicao, bgcolor="white", color="black", width=120)
     atualizar_button = ft.ElevatedButton("Atualizar Perfil", on_click=atualizar_perfil, visible=False, bgcolor="white", color="black", width=140)
 
+    # NAVIGATION BAR CORRIGIDA
+    def mudar_tela(e):
+        index = e.control.selected_index
+        if index == 0:
+            page.go("/home")
+        elif index == 1:
+            page.go("/desempenho")
+        elif index == 2:
+            page.go("/notificação")
+        elif index == 3:
+            page.go("/perfil")
+
+    navbar = ft.NavigationBar(
+        selected_index=3,  # Corrigido: índice 3 para a página de perfil
+        destinations=[
+            ft.NavigationBarDestination(
+                icon=ft.Icons.HOME_OUTLINED,
+                selected_icon=ft.Icons.HOME,
+                label="Início"
+            ),
+            ft.NavigationBarDestination(
+                icon=ft.Icons.BAR_CHART_OUTLINED,
+                selected_icon=ft.Icons.BAR_CHART,
+                label="Desempenho"
+            ),
+            ft.NavigationBarDestination(
+                icon=ft.Icons.NOTIFICATIONS_OUTLINED,
+                selected_icon=ft.Icons.NOTIFICATIONS,
+                label="Notificações"
+            ),
+            ft.NavigationBarDestination(
+                icon=ft.Icons.PERSON_OUTLINED,
+                selected_icon=ft.Icons.PERSON,
+                label="Perfil"
+            ),
+        ],
+        on_change=mudar_tela
+    )
+
     # ---------- Return View ----------
     return ft.View(
         route="/perfil",
@@ -253,7 +290,13 @@ def PerfilView(page: ft.Page):
                 horizontal_alignment="center",
                 alignment="start",
                 spacing=20,
-                scroll=ft.ScrollMode.AUTO
+                scroll=ft.ScrollMode.AUTO,
+                expand=True  # Adicionado para melhor layout
+            ),
+            ft.Container(  # Container para a navbar ficar fixa na parte inferior
+                content=navbar,
+                padding=0,
+                margin=0
             )
         ],
         vertical_alignment="start", 
