@@ -1,5 +1,7 @@
 from flet import *
 import flet as ft
+import time
+import threading
 from detalhes import DetalhesView
 
 def DesempenhoView(page: ft.Page):
@@ -14,6 +16,25 @@ def DesempenhoView(page: ft.Page):
     page.window.min_width = 500
     page.window.min_height = 800
     page.scroll = ft.ScrollMode.AUTO
+    
+    # Função de scroll automático segura (mesma implementação do HomeView)
+    def start_auto_scroll():
+        # Espera a página estar completamente carregada
+        def safe_auto_scroll():
+            time.sleep(3)  # Aguarda 3 segundos para garantir que a página esteja carregada
+            if page and hasattr(page, 'scroll_to'):
+                try:
+                    # Scroll suave para baixo
+                    page.scroll_to(offset=0, duration=500)
+                    time.sleep(1)
+                    for i in range(1, 50):  # Reduzido para ser mais rápido
+                        time.sleep(0.03)
+                        page.scroll_to(offset=i * 20, duration=200, curve=ft.AnimationCurve.EASE_OUT)
+                except Exception as e:
+                    print(f"Scroll automático não pôde ser executado: {e}")
+        
+        # Inicia em uma thread separada
+        threading.Thread(target=safe_auto_scroll, daemon=True).start()
 
     # ===================================== CRIANDO FUNÇÕES DOS ELEMENTOS
     def clicou_menu(e):
@@ -55,8 +76,19 @@ def DesempenhoView(page: ft.Page):
     ],
     )
 
-    # Função para mudar de tela conforme índice do NavigationBar    
+
     def mudar_tela(e):
+        # Evita navegação múltipla rápida
+        if page.route == "/home" and e.control.selected_index == 0:
+            return
+        if page.route == "/desempenho" and e.control.selected_index == 1:
+            return
+        if page.route == "/notificação" and e.control.selected_index == 2:
+            return
+        if page.route == "/perfil" and e.control.selected_index == 3:
+            return
+
+        # Função para mudar de tela conforme índice do NavigationBar
         index = e.control.selected_index
         if index == 0:
             page.go("/home")
@@ -404,16 +436,31 @@ def DesempenhoView(page: ft.Page):
    
     # page.add(topo, appbar, navbar, ocorenrias_card)
 
-    return ft.View(
-        route="/desempenho",
+    # Coloca o conteúdo principal dentro de um ListView para suportar scroll vertical
+    content_listview = ft.ListView(
+        expand=True,
+        spacing=10,
+        padding=20,
         controls=[
             topo,
-            appbar,
-            navbar,
-            ocorenrias_card
-        ],
-        vertical_alignment="center",
-        horizontal_alignment="center"
+            ocorenrias_card,
+        ]
     )
+
+    view = ft.View(
+        route="/desempenho",
+        controls=[
+            appbar,
+            content_listview,
+            navbar,
+        ],
+        vertical_alignment="start",
+        horizontal_alignment="center",
+    )
+
+    # Inicia o scroll automático quando a view carregar
+    view.on_load = lambda _: start_auto_scroll()
+
+    return view
 
 # ft.app(target = DesempenhoView)

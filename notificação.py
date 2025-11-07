@@ -154,6 +154,16 @@ def View_notificacao(page: ft.Page):
         )
      # NAVIGATION BAR
     def mudar_tela(e):
+        # Evita navegação múltipla rápida
+        if page.route == "/home" and e.control.selected_index == 0:
+            return
+        if page.route == "/desempenho" and e.control.selected_index == 1:
+            return
+        if page.route == "/notificação" and e.control.selected_index == 2:
+            return
+        if page.route == "/perfil" and e.control.selected_index == 3:
+            return
+
         index = e.control.selected_index
         if index == 0:
             page.go("/home")

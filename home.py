@@ -353,6 +353,18 @@ def HomeView(page: ft.Page):
         "user_role"
     )
 
+    user_phone = register_text_control(
+        ft.Text("", size=14, color=ft.Colors.GREY_400),
+        14,
+        "user_phone"
+    )
+
+    user_birth = register_text_control(
+        ft.Text("", size=14, color=ft.Colors.GREY_400),
+        14,
+        "user_birth"
+    )
+
     edit_profile_button = ft.ElevatedButton(
         text="Editar Perfil",
         icon=ft.Icons.EDIT_ROUNDED,
@@ -360,7 +372,7 @@ def HomeView(page: ft.Page):
             padding=ft.padding.symmetric(horizontal=20, vertical=10),
             shape=ft.RoundedRectangleBorder(radius=10)
         ),
-        on_click=ir_para_perfil
+    on_click=lambda e: (open(str(Path(__file__).resolve().parent / "perfil_action.json"), "w", encoding="utf-8").write('{"action":"edit"}'), page.go("/perfil"))
     )
 
     # Imagem do perfil (variável para permitir atualização dinâmica)
@@ -372,35 +384,65 @@ def HomeView(page: ft.Page):
     )
 
     # Funções para carregar e aplicar perfil do arquivo JSON
-    def _perfil_json_path():
+ 
+
+    def _perfil_candidate_paths():
+        """Retorna lista de caminhos prováveis onde o perfil pode ser salvo.
+        Nós monitoramos todos para permitir live-reload quando qualquer um mudar.
+        """
         try:
-            base = Path(__file__).resolve().parent.parent
+            project_root = Path(__file__).resolve().parent
         except Exception:
-            base = Path(os.getcwd())
-        return base / "perfil_usuario.json"
+            project_root = Path(os.getcwd())
+        candidates = [
+            project_root / "perfil_usuario.json",
+            Path(os.getcwd()) / "perfil_usuario.json",
+            Path(os.getcwd()) / "session.json",
+            Path(os.getcwd()) / "usuarios.json",
+        ]
+        # unique and existing candidates may be empty initially, but watcher will handle
+        seen = []
+        out = []
+        for p in candidates:
+            if str(p) not in seen:
+                seen.append(str(p))
+                out.append(p)
+        return out
 
     def load_profile_from_file():
-        path = _perfil_json_path()
-        if not path.exists():
-            print(f"Arquivo de perfil não encontrado em: {path}")
-            return {}
-        try:
-            with open(path, "r", encoding="utf-8") as f:
-                data = json.load(f)
-            return data if isinstance(data, dict) else {}
-        except Exception as e:
-            print(f"Erro ao ler perfil: {e}")
-            return {}
+        # tenta ler a partir do primeiro arquivo candidato que exista
+        for path in _perfil_candidate_paths():
+            if not path.exists():
+                continue
+            try:
+                with open(path, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                if isinstance(data, dict):
+                    return data
+                # se for usuarios.json (lista), tenta pegar último usuário
+                if isinstance(data, dict) and "usuarios" in data and isinstance(data["usuarios"], list) and len(data["usuarios"]):
+                    return data["usuarios"][-1]
+            except Exception as e:
+                print(f"Erro ao ler perfil em {path}: {e}")
+        # nenhum arquivo disponível ou leitura falhou
+        # não imprime sempre para evitar spam no watcher
+        return {}
 
     def apply_profile_to_view(profile: dict):
         try:
             nome = profile.get("nome") or profile.get("Nome")
             email = profile.get("email") or profile.get("Email")
+            telefone = profile.get("telefone") or profile.get("Telefone")
+            nascimento = profile.get("data_nascimento") or profile.get("data_nascimento") or profile.get("data")
             foto = profile.get("foto") or profile.get("Foto")
             if nome:
                 user_name.value = nome
             if email:
                 user_role.value = email
+            if telefone is not None:
+                user_phone.value = telefone
+            if nascimento is not None:
+                user_birth.value = nascimento
             if foto:
                 if isinstance(foto, str) and (foto.startswith("http://") or foto.startswith("https://")):
                     profile_image.src = foto
@@ -433,28 +475,38 @@ def HomeView(page: ft.Page):
         watcher_started = True
 
         def watcher():
-            path = _perfil_json_path()
-            try:
-                last_mtime = path.stat().st_mtime if path.exists() else 0
-            except Exception:
-                last_mtime = 0
+            candidate_paths = _perfil_candidate_paths()
+            # inicializa dict de mtimes
+            last_mtimes = {}
+            for p in candidate_paths:
+                try:
+                    last_mtimes[str(p)] = p.stat().st_mtime if p.exists() else 0
+                except Exception:
+                    last_mtimes[str(p)] = 0
+
             while True:
                 try:
                     time.sleep(poll_interval)
-                    if not path.exists():
-                        continue
-                    mtime = path.stat().st_mtime
-                    if mtime != last_mtime:
-                        last_mtime = mtime
-                        # schedule reload on the main thread
+                    for p in candidate_paths:
                         try:
-                            page.call_later(lambda: reload_profile())
+                            if not p.exists():
+                                mtime = 0
+                            else:
+                                mtime = p.stat().st_mtime
                         except Exception:
-                            # fallback: call directly (may be unsafe in some environments)
+                            mtime = 0
+                        key = str(p)
+                        if mtime != last_mtimes.get(key, 0):
+                            last_mtimes[key] = mtime
+                            # schedule reload on the main thread
                             try:
-                                reload_profile()
-                            except Exception as e:
-                                print(f"Erro ao recarregar perfil pelo watcher: {e}")
+                                page.call_later(lambda: reload_profile())
+                            except Exception:
+                                # fallback: call directly (may be unsafe in some environments)
+                                try:
+                                    reload_profile()
+                                except Exception as e:
+                                    print(f"Erro ao recarregar perfil pelo watcher: {e}")
                 except Exception as e:
                     print(f"Erro no profile watcher: {e}")
 
@@ -477,13 +529,13 @@ def HomeView(page: ft.Page):
                     controls=[
                         user_name,
                         user_role,
-                        ft.Row(
-                            spacing=8,
-                            controls=[
-                                edit_profile_button,
-                                ft.IconButton(ft.Icons.REFRESH, tooltip="Atualizar perfil", on_click=reload_profile)
-                            ]
-                        )
+                                ft.Row(
+                                    spacing=8,
+                                    controls=[
+                                        edit_profile_button,
+                                        ft.IconButton(ft.Icons.REFRESH, tooltip="Atualizar perfil", on_click=reload_profile)
+                                    ]
+                                )
                     ]
                 )
             ]
@@ -502,6 +554,16 @@ def HomeView(page: ft.Page):
 
     # NAVIGATION BAR
     def mudar_tela(e):
+        # Evita navegação múltipla rápida
+        if page.route == "/home" and e.control.selected_index == 0:
+            return
+        if page.route == "/desempenho" and e.control.selected_index == 1:
+            return
+        if page.route == "/notificação" and e.control.selected_index == 2:
+            return
+        if page.route == "/perfil" and e.control.selected_index == 3:
+            return
+
         index = e.control.selected_index
         if index == 0:
             page.go("/home")
