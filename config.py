@@ -295,6 +295,7 @@ def main(page: ft.Page):
             padding=20,
             expand=True
         )
+        
 
         return ft.View(
             route="/config",
@@ -309,4 +310,3 @@ def main(page: ft.Page):
     page.views.append(configuracoes_view())
     page.update()
 
-ft.app(target=main)
