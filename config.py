@@ -338,17 +338,18 @@ def main(page: ft.Page):
             expand=True
         )
 
-        return ft.View(
-            route="/config",
-            controls=[
-                app_bar,
-                conteudo_principal,
-            ],
-            bgcolor=bg_color
-        )
 
     # Inicializar a view
     page.views.append(configuracoes_view())
     page.update()
 
-ft.app(target=main)
+    return ft.View(
+    route="/home",
+    controls=[       ft.Container(
+            content=configuracoes_view,
+            alignment=ft.alignment.center,
+            expand=True,
+        )],
+    vertical_alignment="center",
+    horizontal_alignment="center",
+        )
