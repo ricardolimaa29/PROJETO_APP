@@ -68,60 +68,19 @@ def main(page: ft.Page):
         if 'analytics' in switches:
             switches['analytics'].value = config["analytics"]
         
-        # Mostrar mensagem de sucesso diretamente
-        snackbar = ft.SnackBar(
-            content=ft.Text("Configurações restauradas com sucesso!", color="white"),
-            bgcolor=ft.Colors.GREEN_600,
-            duration=2000
-        )
-        page.overlay.append(snackbar)
-        snackbar.open = True
+        mostrar_snackbar("Configurações restauradas com sucesso!", "success")
         page.update()
-        
-        # Remover o snackbar após algum tempo
-        def remover_snackbar():
-            page.overlay.remove(snackbar)
-            page.update()
-        
-        import threading
-        timer = threading.Timer(2.1, remover_snackbar)
-        timer.start()
 
     def limpar_cache(e):
-        # Mostrar mensagem diretamente
-        snackbar = ft.SnackBar(
-            content=ft.Text("Cache limpo com sucesso! 45MB liberados.", color="white"),
-            bgcolor=ft.Colors.BLUE_600,
-            duration=2000
-        )
-        page.overlay.append(snackbar)
-        snackbar.open = True
-        page.update()
+        mostrar_snackbar("Cache limpo com sucesso! 45MB liberados.", "success")
 
     def exportar_dados(e):
-        # Mostrar mensagem diretamente
-        snackbar = ft.SnackBar(
-            content=ft.Text("Dados exportados com sucesso!", color="white"),
-            bgcolor=ft.Colors.BLUE_600,
-            duration=2000
-        )
-        page.overlay.append(snackbar)
-        snackbar.open = True
-        page.update()
+        mostrar_snackbar("Dados exportados com sucesso!", "success")
 
     def mostrar_info_app(e):
-        # Mostrar mensagem diretamente
-        snackbar = ft.SnackBar(
-            content=ft.Text("App v2.1.0 • Desenvolvido com Flet", color="white"),
-            bgcolor=ft.Colors.PURPLE_600,
-            duration=3000
-        )
-        page.overlay.append(snackbar)
-        snackbar.open = True
-        page.update()
+        mostrar_snackbar("App v2.1.0 • Desenvolvido com Flet", "info")
 
     def mostrar_snackbar(mensagem, tipo):
-        # Método alternativo para mostrar snackbar
         cores = {
             "success": ft.Colors.GREEN_600,
             "info": ft.Colors.BLUE_600,
@@ -129,14 +88,13 @@ def main(page: ft.Page):
             "error": ft.Colors.RED_600
         }
         
-        snackbar = ft.SnackBar(
-            content=ft.Text(mensagem, color="white"),
-            bgcolor=cores.get(tipo, ft.Colors.BLUE_600),
-            duration=2000
+        page.show_snack_bar(
+            ft.SnackBar(
+                content=ft.Text(mensagem, color="white"),
+                bgcolor=cores.get(tipo, ft.Colors.BLUE_600),
+                duration=2000
+            )
         )
-        page.overlay.append(snackbar)
-        snackbar.open = True
-        page.update()
 
     def configuracoes_view():
         # Cores baseadas no tema
@@ -338,18 +296,17 @@ def main(page: ft.Page):
             expand=True
         )
 
+        return ft.View(
+            route="/config",
+            controls=[
+                app_bar,
+                conteudo_principal,
+            ],
+            bgcolor=bg_color
+        )
 
     # Inicializar a view
     page.views.append(configuracoes_view())
     page.update()
 
-    return ft.View(
-    route="/home",
-    controls=[       ft.Container(
-            content=configuracoes_view,
-            alignment=ft.alignment.center,
-            expand=True,
-        )],
-    vertical_alignment="center",
-    horizontal_alignment="center",
-        )
+ft.app(target=main)
