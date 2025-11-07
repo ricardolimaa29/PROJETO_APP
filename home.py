@@ -269,6 +269,9 @@ def HomeView(page: ft.Page):
     def ir_para_perfil(e):
         page.go("/perfil")
 
+    def ir_para_feedback(e):
+        page.go("/feedback")
+
     def ir_para_aulas(e):
         page.go("/aulasView")
 
@@ -316,8 +319,8 @@ def HomeView(page: ft.Page):
                     ),
                     ft.PopupMenuItem(
                         text="FEEDBACK",
-                        icon="SUN", 
-                        on_click=lambda e: print("FEEDBACK")
+                        icon=ft.Icons.FEEDBACK,
+                        on_click=ir_para_feedback
                     ),
                     ft.PopupMenuItem(
                         text="CONFIGURAÇÕES",
@@ -329,7 +332,7 @@ def HomeView(page: ft.Page):
                         icon="HELP_OUTLINE_ROUNDED", 
                         on_click=ir_para_suporte
                     ),
-                    
+                    ft.PopupMenuItem(),
                     ft.PopupMenuItem(
                         text="SAIR",
                         icon="CLOSE_ROUNDED", 

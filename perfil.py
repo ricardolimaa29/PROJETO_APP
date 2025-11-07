@@ -97,8 +97,9 @@ def PerfilView(page: ft.Page):
                     ft.PopupMenuItem(text="ACESSIBILIDADE", icon="ACCESSIBILITY", on_click=clicou_menu),
                     ft.PopupMenuItem(text="CONFIGURAÇÕES", icon="SETTINGS_OUTLINED", on_click=clicou_menu),
                     ft.PopupMenuItem(text="SUPORTE", icon="HELP_OUTLINE_ROUNDED", on_click=clicou_menu),
+                    ft.PopupMenuItem(text="FEEDBACK", icon="FEEDBACK", on_click=lambda e:page.go("/feedback")),
                     ft.PopupMenuItem(),
-                    ft.PopupMenuItem(text="SAIR", icon="CLOSE_ROUNDED", on_click=lambda e: page.go("/")),
+                    ft.PopupMenuItem(text="SAIR", icon="CLOSE_ROUNDED", on_click=lambda e:page.go("/")),
                 ]
             ),
         ],
@@ -141,14 +142,17 @@ def PerfilView(page: ft.Page):
         width=40, height=40, alignment=ft.alignment.center,
     )
 
+    # container interno que segura a imagem (usado para ajustar raio/tamanho dinamicamente)
+    inner_container = ft.Container(
+        content=foto,
+        width=110, height=110,
+        border_radius=55,
+        clip_behavior=ft.ClipBehavior.HARD_EDGE
+    )
+
     foto_stack = ft.Stack(
         controls=[
-            ft.Container(
-                content=foto,
-                width=110, height=110,
-                border_radius=55,
-                clip_behavior=ft.ClipBehavior.HARD_EDGE
-            ),
+            inner_container,
             ft.Container(content=botao_alterar, alignment=ft.alignment.top_left, padding=5),
         ],
         width=120, height=120,
@@ -158,7 +162,7 @@ def PerfilView(page: ft.Page):
         content=foto_stack,
         padding=4,
         border=ft.border.all(3, ft.Colors.WHITE),  # borda mais visível
-        border_radius=66,  # raio para formar círculo perfeito (metade da largura)
+        border_radius=66,  # valor inicial; será ajustado dinamicamente
         width=132, height=132,
         alignment=ft.alignment.center,
         bgcolor=None,  # transparente para deixar a borda e o fundo da página aparecerem

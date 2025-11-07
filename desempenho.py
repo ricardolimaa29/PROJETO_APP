@@ -56,6 +56,8 @@ def DesempenhoView(page: ft.Page):
         print(f"Tema alterado para: {page.theme_mode}")
         page.update()
 
+    # Botões de Feedback e Sair (visíveis no AppBar)
+
     appbar = ft.AppBar(
     leading=ft.IconButton(
         ft.Icons.ARROW_BACK,
@@ -64,11 +66,13 @@ def DesempenhoView(page: ft.Page):
     title=ft.Text("DESEMPENHO", weight="bold"),  # título da AppBar
     bgcolor=ft.Colors.SURFACE_CONTAINER_HIGHEST,  # cor de fundo
     actions=[  # ações do lado direito
+        
         ft.PopupMenuButton(
             items=[
                 ft.PopupMenuItem(text="TEMA", icon="WB_SUNNY_OUTLINED", on_click=mudar_tema),
                 ft.PopupMenuItem(text="CONFIGURAÇÕES", icon="SETTINGS_OUTLINED", on_click=clicou_menu),
                 ft.PopupMenuItem(text="SUPORTE", icon="HELP_OUTLINE_ROUNDED", on_click=clicou_menu),
+                ft.PopupMenuItem(text="FEEDBACK", icon="FEEDBACK", on_click=lambda e:page.go("/feedback")),
                 ft.PopupMenuItem(),  # separador
                 ft.PopupMenuItem(text="SAIR", icon="CLOSE_ROUNDED", on_click=lambda e:page.go("/")),
             ]

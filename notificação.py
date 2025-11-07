@@ -146,6 +146,7 @@ def View_notificacao(page: ft.Page):
                     ft.PopupMenuItem(text="TEMA", icon="WB_SUNNY_OUTLINED", on_click=mudar_tema),
                     ft.PopupMenuItem(text="CONFIGURAÇÕES", icon="SETTINGS_OUTLINED", on_click=clicou_menu),
                     ft.PopupMenuItem(text="SUPORTE", icon="HELP_OUTLINE_ROUNDED", on_click=clicou_menu),
+                    ft.PopupMenuItem(text="FEEDBACK", icon="FEEDBACK", on_click=lambda e:page.go("/feedback")),
                     ft.PopupMenuItem(),  # separador
                     ft.PopupMenuItem(text="SAIR", icon="CLOSE_ROUNDED", on_click=lambda e:page.go("/")),
                 ]
