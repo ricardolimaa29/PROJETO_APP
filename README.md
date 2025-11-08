@@ -1,4 +1,4 @@
-# 🚀 App Mobile - Fábrica de Programadores  
+# 🚀 App Mobile - Fábrica
 
 <div align="center">
   
