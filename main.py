@@ -8,6 +8,7 @@ from notificação import View_notificacao
 from suporte import suporte_view
 from feedback import feedback_view
 from detalhes import DetalhesView
+from AULAS import aulas_view
 
 
 # CRIAR UM BOTAO PARA INSERIR UM SITE DE PORTFOLIO PARA CADA DEV COM AS INFORMAÇÕES E O LINK PARA GIT
@@ -29,6 +30,8 @@ def main(page: ft.Page):
             page.views.append(PerfilView(page)) 
         elif page.route == "/feedback":
             page.views.append(feedback_view(page))
+        elif page.route == "/aulas":
+            page.views.append(aulas_view(page))
         elif page.route == "/notificação":
             page.views.append(View_notificacao(page)) 
         elif page.route == "/suporte":

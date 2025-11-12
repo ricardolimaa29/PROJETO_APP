@@ -273,7 +273,7 @@ def HomeView(page: ft.Page):
         page.go("/feedback")
 
     def ir_para_aulas(e):
-        page.go("/aulasView")
+        page.go("/aulas")
 
     def ir_para_suporte(e):
         page.go("/suporte")
@@ -642,7 +642,7 @@ def HomeView(page: ft.Page):
     )
 
     eventos = ft.Container(
-        on_click=lambda _:page.go("/aulasView"),
+        on_click=ir_para_aulas,
         ink=True,
         content=ft.Column(
             alignment=ft.alignment.center, 
