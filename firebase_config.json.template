@@ -1,0 +1,15 @@
+# Template de Configuração Firebase
+# COPIE ESTE ARQUIVO PARA firebase_config.json E PREENCHA COM SUAS CREDENCIAIS
+# NÃO COMITE firebase_config.json NO GIT!
+
+{
+  "apiKey": "AIzaSyXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+  "authDomain": "seu-projeto.firebaseapp.com",
+  "projectId": "seu-projeto",
+  "storageBucket": "seu-projeto.appspot.com",
+  "messagingSenderId": "123456789012",
+  "appId": "1:123456789012:web:abcdef123456789",
+  "measurementId": "G-XXXXXXXXXX",
+  "clientId": "123456789012-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.apps.googleusercontent.com",
+  "clientSecret": "GOCSPX-xxxxxxxxxxxxxxxxxxxxxxxx"
+}
