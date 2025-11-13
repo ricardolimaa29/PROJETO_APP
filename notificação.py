@@ -1,6 +1,7 @@
 import flet as ft
 import time
 import threading
+from app_settings import write_theme, apply_theme
 
 class MessageManager:
     def __init__(self):
@@ -19,7 +20,11 @@ class MessageManager:
 
 def View_notificacao(page: ft.Page):
     page.title = "Fabrica de programadores"
-    page.theme_mode = "dark"
+    # Aplica o tema persistido
+    try:
+        apply_theme(page)
+    except Exception:
+        page.theme_mode = "dark"
     page.window.min_height = 800
     page.window.min_width = 500
     page.window.max_height = 800
@@ -126,33 +131,38 @@ def View_notificacao(page: ft.Page):
             mudar_tema(None)
 
     def mudar_tema(e):
-        if page.theme_mode == ft.ThemeMode.DARK:
-            page.theme_mode = ft.ThemeMode.LIGHT
-            page.theme = ft.Theme(color_scheme_seed=ft.Colors.INDIGO)
-        else:
-            page.theme_mode = ft.ThemeMode.DARK
-            page.theme = ft.Theme(color_scheme_seed=ft.Colors.INDIGO)
-        print(f"Tema alterado para: {page.theme_mode}")
+        try:
+            if page.theme_mode == ft.ThemeMode.DARK:
+                write_theme("light")
+            else:
+                write_theme("dark")
+            apply_theme(page)
+            print(f"Tema alterado para: {page.theme_mode}")
+            page.update()
+        except Exception as ex:
+            print(f"Erro ao alterar tema: {ex}")
+            
     appbar = ft.AppBar(
-        leading=ft.IconButton(
-            ft.Icons.ARROW_BACK,
-            on_click=lambda _: page.go('/home'),
-        ), 
-        title=ft.Text("NOTIFICAÇÕES", weight="bold"),  # título da AppBar
-        bgcolor=ft.Colors.SURFACE_CONTAINER_HIGHEST,  # cor de fundo
-        actions=[  # ações do lado direito
-            ft.PopupMenuButton(
-                items=[
-                    ft.PopupMenuItem(text="TEMA", icon="WB_SUNNY_OUTLINED", on_click=mudar_tema),
-                    ft.PopupMenuItem(text="CONFIGURAÇÕES", icon="SETTINGS_OUTLINED", on_click=clicou_menu),
-                    ft.PopupMenuItem(text="SUPORTE", icon="HELP_OUTLINE_ROUNDED", on_click=clicou_menu),
-                    ft.PopupMenuItem(text="FEEDBACK", icon="FEEDBACK", on_click=lambda e:page.go("/feedback")),
-                    ft.PopupMenuItem(),  # separador
-                    ft.PopupMenuItem(text="SAIR", icon="CLOSE_ROUNDED", on_click=lambda e:page.go("/")),
-                ]
-            ),
-        ],
-        )
+    leading=ft.IconButton(
+        ft.Icons.ARROW_BACK,
+        on_click=lambda _:page.go('/home'),
+    ), 
+    title=ft.Text("DESEMPENHO", weight="bold"),  # título da AppBar
+    bgcolor=ft.Colors.SURFACE_CONTAINER_HIGHEST,  # cor de fundo
+    actions=[  # ações do lado direito
+        
+        ft.PopupMenuButton(
+            items=[
+                ft.PopupMenuItem(text="TEMA", icon="WB_SUNNY_OUTLINED", on_click=mudar_tema),
+                ft.PopupMenuItem(text="CONFIGURAÇÕES", icon="SETTINGS_OUTLINED", on_click=clicou_menu),
+                ft.PopupMenuItem(text="SUPORTE", icon="HELP_OUTLINE_ROUNDED", on_click="/suporte"),
+                ft.PopupMenuItem(text="FEEDBACK", icon="FEEDBACK", on_click=("/feedback")),
+                ft.PopupMenuItem(),  # separador
+                ft.PopupMenuItem(text="SAIR", icon="CLOSE_ROUNDED", on_click=("/")),
+            ]
+        ),
+    ],
+    )
      # NAVIGATION BAR
     def mudar_tela(e):
         # Evita navegação múltipla rápida

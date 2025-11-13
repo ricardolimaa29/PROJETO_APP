@@ -5,11 +5,18 @@ import threading
 import json
 from pathlib import Path
 import os
+from app_settings import write_theme, apply_theme, read_theme
 
 def HomeView(page: ft.Page):
     
-    page.theme_mode = ft.ThemeMode.DARK 
-    page.theme = ft.Theme(color_scheme_seed=ft.Colors.INDIGO)
+    # Aplica o tema persistido, se houver
+    try:
+        apply_theme(page)
+    except Exception:
+        # Fallback para tema padrão
+        page.theme_mode = ft.ThemeMode.DARK 
+        page.theme = ft.Theme(color_scheme_seed=ft.Colors.INDIGO)
+    
     page.title = "PROGRAMADORES"
 
     # VARIÁVEL PARA CONTROLE DO TAMANHO DA FONTE
@@ -266,9 +273,7 @@ def HomeView(page: ft.Page):
     )
 
     # ===================================== FUNÇÕES PRINCIPAIS
-    def ir_para_perfil(e):
-        page.go("/perfil")
-
+ 
     def ir_para_feedback(e):
         page.go("/feedback")
 
@@ -279,14 +284,21 @@ def HomeView(page: ft.Page):
         page.go("/suporte")
 
     def mudar_tema(e):
-        if page.theme_mode == ft.ThemeMode.DARK:
-            page.theme_mode = ft.ThemeMode.LIGHT
-            page.theme = ft.Theme(color_scheme_seed=ft.Colors.INDIGO)
-        else:
-            page.theme_mode = ft.ThemeMode.DARK
-            page.theme = ft.Theme(color_scheme_seed=ft.Colors.INDIGO)
-        print(f"Tema alterado para: {page.theme_mode}")
-        page.update()
+        try:
+            # Toggle e salva o tema
+            if page.theme_mode == ft.ThemeMode.DARK:
+                write_theme("light")
+            else:
+                write_theme("dark")
+            # Aplica o tema persistido
+            apply_theme(page)
+            print(f"Tema alterado para: {page.theme_mode}")
+            page.update()
+        except Exception as ex:
+            print(f"Erro ao alterar tema: {ex}")
+
+
+   
 
 
     # TÍTULO DO APP BAR

@@ -3,11 +3,16 @@ import flet as ft
 import time
 import threading
 from detalhes import DetalhesView
+from app_settings import write_theme, apply_theme
 
 def DesempenhoView(page: ft.Page):
    
-    page.theme_mode = ft.ThemeMode.DARK
-    page.theme = ft.Theme(color_scheme_seed=ft.Colors.INDIGO)
+    # Aplica o tema persistido
+    try:
+        apply_theme(page)
+    except Exception:
+        page.theme_mode = ft.ThemeMode.DARK
+        page.theme = ft.Theme(color_scheme_seed=ft.Colors.INDIGO)
     page.title = "PROGRAMADORES"
     page.window.width = 500
     page.window.height = 800
@@ -47,14 +52,16 @@ def DesempenhoView(page: ft.Page):
             mudar_tema(None)
 
     def mudar_tema(a):
-        if page.theme_mode == ft.ThemeMode.DARK:
-            page.theme_mode = ft.ThemeMode.LIGHT
-            page.theme = ft.Theme(color_scheme_seed=ft.Colors.INDIGO)
-        else:
-            page.theme_mode = ft.ThemeMode.DARK
-            page.theme = ft.Theme(color_scheme_seed=ft.Colors.INDIGO)
-        print(f"Tema alterado para: {page.theme_mode}")
-        page.update()
+        try:
+            if page.theme_mode == ft.ThemeMode.DARK:
+                write_theme("light")
+            else:
+                write_theme("dark")
+            apply_theme(page)
+            print(f"Tema alterado para: {page.theme_mode}")
+            page.update()
+        except Exception as ex:
+            print(f"Erro ao alterar tema: {ex}")
 
     # Botões de Feedback e Sair (visíveis no AppBar)
 
@@ -71,14 +78,16 @@ def DesempenhoView(page: ft.Page):
             items=[
                 ft.PopupMenuItem(text="TEMA", icon="WB_SUNNY_OUTLINED", on_click=mudar_tema),
                 ft.PopupMenuItem(text="CONFIGURAÇÕES", icon="SETTINGS_OUTLINED", on_click=clicou_menu),
-                ft.PopupMenuItem(text="SUPORTE", icon="HELP_OUTLINE_ROUNDED", on_click=clicou_menu),
-                ft.PopupMenuItem(text="FEEDBACK", icon="FEEDBACK", on_click=lambda e:page.go("/feedback")),
+                ft.PopupMenuItem(text="SUPORTE", icon="HELP_OUTLINE_ROUNDED", on_click="/suporte"),
+                ft.PopupMenuItem(text="FEEDBACK", icon="FEEDBACK", on_click=("/feedback")),
                 ft.PopupMenuItem(),  # separador
-                ft.PopupMenuItem(text="SAIR", icon="CLOSE_ROUNDED", on_click=lambda e:page.go("/")),
+                ft.PopupMenuItem(text="SAIR", icon="CLOSE_ROUNDED", on_click=("/")),
             ]
         ),
     ],
     )
+
+
 
 
     def mudar_tela(e):

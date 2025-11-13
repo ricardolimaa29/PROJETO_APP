@@ -1,9 +1,14 @@
 import flet as ft
 # from desempenho import DesempenhoView
+from app_settings import write_theme, apply_theme
 
 def DetalhesView(page: ft.Page): 
-    page.theme_mode = ft.ThemeMode.DARK
-    page.theme = ft.Theme(color_scheme_seed=ft.Colors.INDIGO)
+    # Aplica o tema persistido
+    try:
+        apply_theme(page)
+    except Exception:
+        page.theme_mode = ft.ThemeMode.DARK
+        page.theme = ft.Theme(color_scheme_seed=ft.Colors.INDIGO)
     page.title = "DETALHES"
     page.window.width = 500
     page.window.height = 800
@@ -27,14 +32,16 @@ def DetalhesView(page: ft.Page):
             mudar_tema(None)
 
     def mudar_tema(a):
-        if page.theme_mode == ft.ThemeMode.DARK:
-            page.theme_mode = ft.ThemeMode.LIGHT
-            page.theme = ft.Theme(color_scheme_seed=ft.Colors.INDIGO)
-        else:
-            page.theme_mode = ft.ThemeMode.DARK
-            page.theme = ft.Theme(color_scheme_seed=ft.Colors.INDIGO)
-        print(f"Tema alterado para: {page.theme_mode}")
-        page.update()
+        try:
+            if page.theme_mode == ft.ThemeMode.DARK:
+                write_theme("light")
+            else:
+                write_theme("dark")
+            apply_theme(page)
+            print(f"Tema alterado para: {page.theme_mode}")
+            page.update()
+        except Exception as ex:
+            print(f"Erro ao alterar tema: {ex}")
 
 
     appbar = ft.AppBar(

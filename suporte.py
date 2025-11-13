@@ -1,10 +1,15 @@
 import flet as ft
+from app_settings import write_theme, apply_theme
 
 def suporte_view(page: ft.Page):
     # ---------- Configurações básicas ----------
     page.title = "Suporte"
-    page.theme_mode = ft.ThemeMode.DARK
-    page.theme = ft.Theme(color_scheme_seed=ft.Colors.CYAN)
+    # Aplica o tema persistido
+    try:
+        apply_theme(page)
+    except Exception:
+        page.theme_mode = ft.ThemeMode.DARK
+        page.theme = ft.Theme(color_scheme_seed=ft.Colors.CYAN)
     page.window.width = 500
     page.window.height = 800
     page.window.min_width = 500
@@ -32,14 +37,16 @@ def suporte_view(page: ft.Page):
             print("Encerrar aplicação...")
 
     def mudar_tema(e):
-        if page.theme_mode == ft.ThemeMode.DARK:
-            page.theme_mode = ft.ThemeMode.LIGHT
-            page.theme = ft.Theme(color_scheme_seed=ft.Colors.INDIGO)
-        else:
-            page.theme_mode = ft.ThemeMode.DARK
-            page.theme = ft.Theme(color_scheme_seed=ft.Colors.CYAN)
-        print(f"Tema alterado para: {page.theme_mode}")
-        page.update()
+        try:
+            if page.theme_mode == ft.ThemeMode.DARK:
+                write_theme("light")
+            else:
+                write_theme("dark")
+            apply_theme(page)
+            print(f"Tema alterado para: {page.theme_mode}")
+            page.update()
+        except Exception as ex:
+            print(f"Erro ao alterar tema: {ex}")
 
     # ===================================== FUNÇÕES DOS ELEMENTOS =====================================
     def enviar_click(e):

@@ -5,9 +5,14 @@ import re
 from pathlib import Path
 import time
 import threading
+from app_settings import write_theme, apply_theme
 
 def PerfilView(page: ft.Page):
-    page.theme_mode = "dark"
+    # Aplica o tema persistido
+    try:
+        apply_theme(page)
+    except Exception:
+        page.theme_mode = "dark"
     page.horizontal_alignment = "center"
     page.vertical_alignment = "start"
     page.window.center()
@@ -79,30 +84,26 @@ def PerfilView(page: ft.Page):
             duration=3000
         ))
 
-    app_bar = ft.AppBar(
-        leading=ft.IconButton(
-            ft.Icons.ARROW_BACK,
-            icon_color="white",
-            tooltip="Voltar",
-            on_click=voltar,
+    appbar = ft.AppBar(
+    leading=ft.IconButton(
+        ft.Icons.ARROW_BACK,
+        on_click=lambda _:page.go('/home'),
+    ), 
+    title=ft.Text("DESEMPENHO", weight="bold"),  # título da AppBar
+    bgcolor=ft.Colors.SURFACE_CONTAINER_HIGHEST,  # cor de fundo
+    actions=[  # ações do lado direito
+        
+        ft.PopupMenuButton(
+            items=[
+                ft.PopupMenuItem(text="TEMA", icon="WB_SUNNY_OUTLINED", on_click=mudar_tema),
+                ft.PopupMenuItem(text="CONFIGURAÇÕES", icon="SETTINGS_OUTLINED", on_click=clicou_menu),
+                ft.PopupMenuItem(text="SUPORTE", icon="HELP_OUTLINE_ROUNDED", on_click="/suporte"),
+                ft.PopupMenuItem(text="FEEDBACK", icon="FEEDBACK", on_click=("/feedback")),
+                ft.PopupMenuItem(),  # separador
+                ft.PopupMenuItem(text="SAIR", icon="CLOSE_ROUNDED", on_click=("/")),
+            ]
         ),
-        leading_width=40,
-        title=ft.Text("FÁBRICA DE PROGRAMADORES", weight="bold"),
-        center_title=True,
-        bgcolor=ft.Colors.SURFACE_CONTAINER_HIGHEST,
-        actions=[
-            ft.PopupMenuButton(
-                items=[
-                    ft.PopupMenuItem(text="TEMA", icon="WB_SUNNY_OUTLINED", on_click=mudar_tema),
-                    ft.PopupMenuItem(text="ACESSIBILIDADE", icon="ACCESSIBILITY", on_click=clicou_menu),
-                    ft.PopupMenuItem(text="CONFIGURAÇÕES", icon="SETTINGS_OUTLINED", on_click=clicou_menu),
-                    ft.PopupMenuItem(text="SUPORTE", icon="HELP_OUTLINE_ROUNDED", on_click=clicou_menu),
-                    ft.PopupMenuItem(text="FEEDBACK", icon="FEEDBACK", on_click=lambda e:page.go("/feedback")),
-                    ft.PopupMenuItem(),
-                    ft.PopupMenuItem(text="SAIR", icon="CLOSE_ROUNDED", on_click=lambda e:page.go("/")),
-                ]
-            ),
-        ],
+    ],
     )
 
     # ---------- Foto de perfil e Campos ----------
@@ -417,7 +418,7 @@ def PerfilView(page: ft.Page):
     view = ft.View(
         route="/perfil",
         controls=[
-            app_bar,
+         
             ft.Column(
                 [
                     ft.Container(height=20),

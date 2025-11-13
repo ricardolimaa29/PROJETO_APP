@@ -1,4 +1,5 @@
 import flet as ft
+from app_settings import write_theme, apply_theme, read_theme
 
 avaliacao_enviada = 0
 
@@ -46,6 +47,11 @@ def feedback_view(page: ft.Page):
     page.window.max_height = 800
     page.padding = 0
     
+    # Aplica o tema persistido
+    try:
+        apply_theme(page)
+    except Exception:
+        pass
     
     # ---------- Funções ----------
     def voltar_home(e):
@@ -89,12 +95,15 @@ def feedback_view(page: ft.Page):
         page.update()
 
     def mudar_tema(e=None):
-        page.theme_mode = (
-            ft.ThemeMode.LIGHT
-            if page.theme_mode == ft.ThemeMode.DARK
-            else ft.ThemeMode.DARK
-        )
-        aplicar_tema()
+        try:
+            if page.theme_mode == ft.ThemeMode.DARK:
+                write_theme("light")
+            else:
+                write_theme("dark")
+            apply_theme(page)
+            aplicar_tema()
+        except Exception as ex:
+            print(f"Erro ao alterar tema: {ex}")
 
     def aplicar_tema():
         if page.theme_mode == ft.ThemeMode.DARK:
