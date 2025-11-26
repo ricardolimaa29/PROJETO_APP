@@ -1,0 +1,16 @@
+# Dependências do Projeto - Fábrica de Programadores App
+# Para instalar: pip install -r requirements.txt
+
+# Framework principal
+flet>=0.24.0
+
+# Firebase e autenticação
+firebase-admin>=6.5.0
+python-dotenv>=1.0.0
+
+# HTTP e requests
+requests>=2.31.0
+urllib3>=2.0.0
+
+# Utilitários
+pathlib>=1.0.1
